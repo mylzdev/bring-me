@@ -1,12 +1,22 @@
-
 class TValidator {
   static String? validateNickname(String? fieldName, String? value) {
     if (value == null || value.isEmpty) {
       return '$fieldName is required';
-    } else if (value.length >= 10) {
-      return 'Nickaname should not be exceed at 10 letters';
+    } else if (value.length >= 15) {
+      return 'Username should not exceed at 15 characters';
+    } else if (value.length < 3) {
+      return 'Username should be at least 3 characters';
     }
 
+    return null;
+  }
+
+  static String? validateRoomCode(String? fieldname, String? value) {
+    if (value == null || value.isEmpty) {
+      return '$fieldname is required';
+    } else if (value.length > 5 || value.length < 5) {
+      return 'Room code is consist of 5 numbers';
+    }
     return null;
   }
 

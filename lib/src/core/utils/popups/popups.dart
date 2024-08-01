@@ -2,26 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
-import '../constants/colors.dart';
-import '../helpers/helper_functions.dart';
+import '../../config/colors.dart';
 
 class TPopup {
   static bool _isSnackbarOpen = false;
 
-  static void customToast({required String message}) {
+  static void customToast(
+      {required String message, Duration? duration, Color? backgroundColor}) {
+    _isSnackbarOpen = true;
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       SnackBar(
         elevation: 0,
-        duration: const Duration(milliseconds: 1500),
+        duration: duration ?? const Duration(milliseconds: 1500),
         backgroundColor: Colors.transparent,
         content: Container(
           padding: const EdgeInsets.all(12.0),
           margin: const EdgeInsets.symmetric(horizontal: 30),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
-            color: THelperFunctions.isDarkMode(Get.context!)
-                ? TColors.darkerGrey.withOpacity(0.9)
-                : TColors.grey.withOpacity(0.9),
+            color: backgroundColor ?? TColors.grey.withOpacity(0.9),
           ),
           child: Center(
             child: Text(

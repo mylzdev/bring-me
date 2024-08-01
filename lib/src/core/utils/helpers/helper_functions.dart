@@ -1,101 +1,14 @@
+import 'dart:math';
+
+import 'package:bring_me/src/core/config/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../constants/text_strings.dart';
-import '../popups/popups.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../config/text_strings.dart';
+import '../popups/popups.dart';
+
 class THelperFunctions {
-  static Color? getColor(String value) {
-    /// Define your product specific colors here and it will match the attribute colors and show specific 🟠🟡🟢🔵🟣🟤
-
-    if (value == 'Green') {
-      return Colors.green;
-    } else if (value == 'Green') {
-      return Colors.green;
-    } else if (value == 'Red') {
-      return Colors.red;
-    } else if (value == 'Blue') {
-      return Colors.blue;
-    } else if (value == 'Pink') {
-      return Colors.pink;
-    } else if (value == 'Grey') {
-      return Colors.grey;
-    } else if (value == 'Purple') {
-      return Colors.purple;
-    } else if (value == 'Black') {
-      return Colors.black;
-    } else if (value == 'White') {
-      return Colors.white;
-    } else if (value == 'Yellow') {
-      return Colors.yellow;
-    } else if (value == 'Orange') {
-      return Colors.deepOrange;
-    } else if (value == 'Brown') {
-      return Colors.brown;
-    } else if (value == 'Teal') {
-      return Colors.teal;
-    } else if (value == 'Indigo') {
-      return Colors.indigo;
-    } else {
-      return null;
-    }
-  }
-
-  static void showSnackBar(String message) {
-    ScaffoldMessenger.of(Get.context!).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
-  static void showAlert(String title, String message) {
-    showDialog(
-      context: Get.context!,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  static void navigateToScreen(BuildContext context, Widget screen) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => screen),
-    );
-  }
-
-  static String truncateText(String text, int maxLength) {
-    if (text.length <= maxLength) {
-      return text;
-    } else {
-      return '${text.substring(0, maxLength)}...';
-    }
-  }
-
-  static bool isDarkMode(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark;
-  }
-
-  static Size screenSize() {
-    return MediaQuery.of(Get.context!).size;
-  }
-
-  static double screenHeight() {
-    return MediaQuery.of(Get.context!).size.height;
-  }
-
-  static double screenWidth() {
-    return MediaQuery.of(Get.context!).size.width;
-  }
-
   static List<T> removeDuplicates<T>(List<T> list) {
     return list.toSet().toList();
   }
@@ -141,5 +54,40 @@ class THelperFunctions {
 
   static int createUniqueId() {
     return DateTime.now().microsecondsSinceEpoch.remainder(3);
+  }
+
+  static String generateRoomID() {
+    final random = Random();
+    const length = 5;
+    final StringBuffer randomNumberString = StringBuffer();
+
+    for (int i = 0; i < length; i++) {
+      randomNumberString.write(random.nextInt(10));
+    }
+
+    return randomNumberString.toString();
+  }
+
+  static String getHuntLocation(HuntLocation loc) {
+    switch (loc) {
+      case HuntLocation.indoor:
+        return 'Indoor';
+      case HuntLocation.outdoor:
+        return 'Outdoor';
+      default:
+        return 'Indoor';
+    }
+  }
+
+  static int generateRandomInt(int max) {
+    return Random().nextInt(max);
+  }
+
+  static String convertMinutesToTimeFormat(int totalMinutes) {
+    final int hours = totalMinutes ~/ 60;
+    final int minutes = totalMinutes % 60;
+    // Ensuring two-digit format for minutes
+    final String formattedMinutes = minutes.toString().padLeft(2, '0');
+    return '$hours:$formattedMinutes';
   }
 }

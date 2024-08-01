@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "659392153781",
+    "project_id": "bring-me-ab027",
+    "storage_bucket": "bring-me-ab027.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:659392153781:android:d2f7aaa3ddfdc2e6a996fc",
+        "android_client_info": {
+          "package_name": "com.mylzdev.bringme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCp4DW7glRvnJpx8FaVDjS_fsyBXdR_Mh0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
