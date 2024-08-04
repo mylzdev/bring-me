@@ -5,11 +5,13 @@ class PlayerModel {
   bool isLeader;
   bool isReady;
   int score;
+  int itemLeft;
   PlayerModel({
     required this.name,
     this.isLeader = true,
     this.isReady = true,
     this.score = 0,
+    this.itemLeft = 5,
   });
 
   PlayerModel copyWith({
@@ -18,12 +20,14 @@ class PlayerModel {
     bool? isLeader,
     bool? isReady,
     int? score,
+    int? itemLeft,
   }) {
     return PlayerModel(
       name: name ?? this.name,
       isLeader: isLeader ?? this.isLeader,
       isReady: isReady ?? this.isReady,
       score: score ?? this.score,
+      itemLeft: itemLeft ?? this.itemLeft,
     );
   }
 
@@ -35,6 +39,7 @@ class PlayerModel {
       'isLeader': isLeader,
       'isReady': isReady,
       'score': score,
+      'itemLeft': itemLeft,
     };
   }
 
@@ -44,6 +49,7 @@ class PlayerModel {
       isLeader: map['isLeader'] as bool,
       isReady: map['isReady'] as bool,
       score: map['score'] as int,
+      itemLeft: map['itemLeft'] as int,
     );
   }
 
@@ -56,6 +62,7 @@ class PlayerModel {
         isLeader: data['isLeader'] as bool,
         isReady: data['isReady'] as bool,
         score: data['score'] as int,
+        itemLeft: data['itemLeft'] as int,
       );
     } else {
       return PlayerModel.empty();

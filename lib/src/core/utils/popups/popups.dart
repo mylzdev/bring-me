@@ -20,7 +20,7 @@ class TPopup {
           margin: const EdgeInsets.symmetric(horizontal: 30),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
-            color: backgroundColor ?? TColors.grey.withOpacity(0.9),
+            color: backgroundColor ?? TColors.darkContainer,
           ),
           child: Center(
             child: Text(

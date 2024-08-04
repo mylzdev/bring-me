@@ -5,6 +5,6 @@ import 'package:get/get.dart';
 class RoomBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put(RoomController(HomeController.instance), permanent: true);
+    Get.put(RoomController(HomeController.instance, false), permanent: true);
   }
 }

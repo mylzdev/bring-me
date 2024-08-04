@@ -16,7 +16,7 @@ class GeminiClient {
   Future<String?> generateScavengerHuntItems(String location) async {
     final prompt =
         'You are a scavenger hunt game where objects are found by taking a photo of them.'
-        'Generate a list of $maxGeneratedItems random items that could be found in the following: $location.'
+        'Generate a list of $maxGeneratedItems tangible items that could be found in the following: $location.'
         'The difficulty to find the items should be easy'
         'Keep the item name concise. All letters should be uppercase. Do not include articles (a, an, the).'
         'Provide your response as a JSON object with the following schema: {"items": ["", "", ...]}.'

@@ -144,8 +144,8 @@ class RoomRepository extends GetxService {
     }
   }
 
-  Future<void> updatePlayerScore(
-      String roomID, String username, int newScore) async {
+  Future<void> updatePlayerScoreAndItemLeft(
+      String roomID, String username, int newScore, int newItemLeft) async {
     try {
       final roomRef = _db.collection('Rooms').doc(roomID);
       final roomSnapshot = await roomRef.get();
@@ -162,8 +162,10 @@ class RoomRepository extends GetxService {
         throw "Player not found in room";
       }
 
-      room.players[playerIndex] =
-          room.players[playerIndex].copyWith(score: newScore);
+      room.players[playerIndex] = room.players[playerIndex].copyWith(
+        score: newScore,
+        itemLeft: newItemLeft,
+      );
       await roomRef.update(room.toPlayerJson());
     } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
@@ -172,7 +174,7 @@ class RoomRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Error while updating player score: $e';
+      throw 'Error while updating player score & item left: $e';
     }
   }
 

@@ -61,6 +61,8 @@ dependencies:
   lottie: ^3.1.2
   outline_gradient_button: ^2.0.1+1
   flutter_custom_clippers: ^2.1.0
+  custom_rating_bar: ^3.0.0
+  audioplayers: ^6.0.0
 
 dev_dependencies:
   flutter_test:

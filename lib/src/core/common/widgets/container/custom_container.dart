@@ -40,7 +40,7 @@ class TCustomContainer extends StatelessWidget {
             : const RadialGradient(
                 colors: [
                   Color.fromARGB(255, 24, 12, 15),
-                  Color.fromARGB(255, 36, 17, 25),
+                  Color.fromARGB(255, 29, 14, 20),
                 ],
               ),
         border: Border.all(

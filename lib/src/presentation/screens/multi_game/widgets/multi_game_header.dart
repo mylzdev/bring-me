@@ -1,13 +1,14 @@
 import 'package:bring_me/src/core/config/enums.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../../core/common/widgets/container/custom_container.dart';
-import '../../../../core/common/widgets/text/gradient_text.dart';
-import '../../../../core/config/colors.dart';
-import '../../../../core/config/sizes.dart';
+import '../../../../core/config/lottie.dart';
 import '../../../controllers/room_controller/room_controller.dart';
+import 'multi_game_header_content.dart';
 
 class TMultiGameHeader extends StatelessWidget {
   const TMultiGameHeader({
@@ -19,61 +20,115 @@ class TMultiGameHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TCustomContainer(
-      height: 105,
-      width: double.maxFinite,
-      child: Obx(
-        () => switch (controller.itemHuntStatus.value) {
-          ItemHuntStatus.initial => TMultiGameHeaderContent(
-              title: 'Bring Me',
-              subtitle: controller.currentitem,
-            ),
-          ItemHuntStatus.validationInProgress =>
-            const TMultiGameHeaderContent(subtitle: 'Validating'),
-          ItemHuntStatus.validationFailure =>
-            const TMultiGameHeaderContent(subtitle: 'Failed'),
-          ItemHuntStatus.validationSuccess =>
-            const TMultiGameHeaderContent(subtitle: 'Success'),
-        },
+    return Obx(
+      () => TCustomContainer(
+        height: 105,
+        padding: EdgeInsets.zero,
+        width: double.maxFinite,
+        child: !controller.isFinish.value ||
+                controller.roomInfo.value.gameState == GameState.ended
+            ? switch (controller.roomInfo.value.gameState) {
+                GameState.initial => const SizedBox(),
+                GameState.progress =>
+                  TMultiGameProgress(controller: controller),
+                GameState.ended => TMultiGameEnded(
+                    // Local Game State Ends
+                    subtitle: controller.sortedPlayer.first.name,
+                    title: 'Winner',
+                    shouldPlayPopper: true,
+                  ),
+              }
+            : TMultiGameEnded(
+                // Local Game State Ends
+                subtitle: controller.score.value.toString(),
+                title: 'Total Score:',
+              ),
       ),
     );
   }
 }
 
-class TMultiGameHeaderContent extends StatelessWidget {
-  const TMultiGameHeaderContent(
-      {super.key, this.title = '', required this.subtitle});
+class TMultiGameEnded extends StatelessWidget {
+  const TMultiGameEnded({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    this.shouldPlayPopper = false,
+  });
 
-  final String title;
-  final String subtitle;
+  final String title, subtitle;
+  final bool shouldPlayPopper;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Stack(
+      alignment: Alignment.center,
       children: [
-        Visibility(
-          visible: title != '',
-          child: Column(
-            children: [
-              Text(
-                title,
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: TColors.white.withOpacity(0.8),
-                    ),
-              ),
-              SizedBox(height: TSizes.xs),
-            ],
+        TMultiGameHeaderContent(
+          title: title,
+          subtitle: subtitle,
+        ),
+        OverflowBox(
+          maxHeight: 200,
+          maxWidth: 200,
+          child: Lottie.asset(
+            LottieAsset.confetti,
+            repeat: false,
           ),
         ),
-        TGradientText(
-          subtitle,
-          style: Theme.of(context)
-              .textTheme
-              .headlineMedium!
-              .apply(letterSpacingDelta: 2.sp),
+        Positioned(
+          left: 0,
+          child: Visibility(
+            visible: shouldPlayPopper,
+            child: Lottie.asset(
+              height: 130.h,
+              width: 130.w,
+              LottieAsset.popper,
+            ),
+          ),
+        ),
+        Positioned(
+          right: 0,
+          child: Transform.flip(
+            flipX: true,
+            child: Visibility(
+              visible: shouldPlayPopper,
+              child: Lottie.asset(
+                height: 130.h,
+                width: 130.w,
+                LottieAsset.popper,
+              ),
+            ),
+          ),
         ),
       ],
+    );
+  }
+}
+
+class TMultiGameProgress extends StatelessWidget {
+  const TMultiGameProgress({
+    super.key,
+    required this.controller,
+  });
+
+  final RoomController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(
+      () => switch (controller.itemHuntStatus.value) {
+        ItemHuntStatus.initial => TMultiGameHeaderContent(
+            title: 'Bring Me',
+            subtitle: controller.currentitem,
+          ),
+        ItemHuntStatus.validationInProgress =>
+          const TMultiGameHeaderContent(subtitle: 'Validating'),
+        ItemHuntStatus.validationFailure =>
+          const TMultiGameHeaderContent(shouldUseLottie: true, isCheck: false),
+        ItemHuntStatus.validationSuccess =>
+          const TMultiGameHeaderContent(shouldUseLottie: true),
+      },
     );
   }
 }

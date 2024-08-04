@@ -6,9 +6,12 @@ import 'package:bring_me/src/core/config/text_strings.dart';
 import 'package:bring_me/src/core/utils/helpers/helper_functions.dart';
 import 'package:bring_me/src/core/utils/popups/popups.dart';
 import 'package:bring_me/src/presentation/screens/home/home.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../core/config/colors.dart';
 import '../../../core/config/enums.dart';
+import '../../../core/config/sizes.dart';
 import '../../../core/utils/logging/logger.dart';
 import '../../../data/repository/gemini_repository/gemini_client.dart';
 import '../../../data/repository/gemini_repository/gemini_repository.dart';
@@ -31,15 +34,23 @@ class SingleGameController extends GetxController {
   final score = 0.obs;
 
   // Items
-  final int maxItem = 5;
   final itemRandomizer =
       THelperFunctions.generateRandomInt(GeminiClient.maxGeneratedItems).obs;
   final itemLeft = 5.obs;
-  final itemIndex = 1.obs;
   final _items = <String>[].obs;
   Rx<ItemHuntStatus> itemHuntStatus = ItemHuntStatus.initial.obs;
   final RxList<int> calledItems = <int>[].obs;
   String get currentitem => _items[itemRandomizer.value];
+
+  bool get hideFooterButtons {
+    if (itemHuntStatus.value != ItemHuntStatus.initial ||
+        gameState.value == GameState.initial ||
+        gameState.value == GameState.ended) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   @override
   void onInit() {
@@ -60,14 +71,13 @@ class SingleGameController extends GetxController {
 
   void skipItem() {
     try {
-      if (itemIndex.value < maxItem) {
+      if (itemLeft.value >= 2) {
         itemLeft.value--;
-        itemIndex.value++;
         _generateUniqueItemRandomizer();
         calledItems.add(itemRandomizer.value);
+        _resetTimer();
       } else {
         itemLeft.value--;
-        itemIndex.value++;
         gameState.value = GameState.ended;
 
         String lottie;
@@ -101,6 +111,7 @@ class SingleGameController extends GetxController {
         incrementScore();
         itemHuntStatus.value = ItemHuntStatus.validationSuccess;
         skipItem();
+        _resetTimer();
       } else {
         // Photo not valid
         itemHuntStatus.value = ItemHuntStatus.validationFailure;
@@ -111,14 +122,17 @@ class SingleGameController extends GetxController {
     } finally {
       await Future.delayed(const Duration(seconds: 1));
       itemHuntStatus.value = ItemHuntStatus.initial;
-      _stopwatch.reset();
-      _stopwatch.start();
     }
   }
 
   void incrementScore() {
     final scorePenalty = _stopwatch.elapsedMilliseconds ~/ 2000 * 1;
     score.value += 100 - math.min<int>(scorePenalty, 50);
+  }
+
+  void _resetTimer() {
+    _stopwatch.reset();
+    _stopwatch.start();
   }
 
   void _generateUniqueItemRandomizer() {
@@ -133,7 +147,6 @@ class SingleGameController extends GetxController {
   void retry() async {
     try {
       score.value = 0;
-      itemIndex.value = 1;
       itemLeft.value = 5;
       calledItems.clear();
       _items.clear();
@@ -147,5 +160,34 @@ class SingleGameController extends GetxController {
       Get.offAll(() => const HomeScreen());
       TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
     }
+  }
+
+  void onLeaveGame() async {
+    await Get.defaultDialog(
+      title: 'The data will be lost',
+      middleText: 'Are you sure you want to leave the room?',
+      contentPadding: EdgeInsets.all(TSizes.defaultSpace),
+      titlePadding: EdgeInsets.only(top: TSizes.defaultSpace),
+      confirm: ElevatedButton(
+        onPressed: () => Get.offAll(() => const HomeScreen()),
+        style: ElevatedButton.styleFrom(
+            backgroundColor: TColors.error,
+            padding: EdgeInsets.zero,
+            side: BorderSide.none),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: TSizes.lg),
+          child: const Text('Leave'),
+        ),
+      ),
+      // Cancel button
+      cancel: OutlinedButton(
+        style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
+        onPressed: () => Navigator.of(Get.overlayContext!).pop(),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: TSizes.lg),
+          child: const Text('Cancel'),
+        ),
+      ),
+    );
   }
 }
