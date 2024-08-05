@@ -112,6 +112,30 @@ class RoomRepository extends GetxService {
     }
   }
 
+  Future<void> updateItems(String roomID, List<String> items) async {
+    try {
+      final roomRef = _db.collection('Rooms').doc(roomID);
+      final roomSnapshot = await roomRef.get();
+
+      if (!roomSnapshot.exists) {
+        throw 'Room does not exist';
+      }
+
+      RoomModel room = RoomModel.fromSnapshot(roomSnapshot);
+      room = room.copyWith(items: items);
+      await roomRef.update(room.toJson());
+
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Error while updating items: $e';
+    }
+  }
+
   Future<void> updatePlayerReadyState(
       String roomID, String username, bool isReady) async {
     try {

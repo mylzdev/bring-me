@@ -18,8 +18,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../core/utils/helpers/helper_functions.dart';
-import '../../../data/repository/gemini_repository/gemini_client.dart';
 import '../../../data/repository/gemini_repository/gemini_repository.dart';
 import '../../../data/repository/player_repository/player_model.dart';
 import '../../../data/services/photo_picker/photo_picker_service.dart';
@@ -43,14 +41,13 @@ class RoomController extends GetxController with WidgetsBindingObserver {
 
   // Items
   final _items = RxList<String>();
-  final itemLeft = 5.obs; // Hard coded must change player model item left
+  final _fakeItems = RxList<String>();
+  final itemLeft =
+      PlayerModel.maxItems.obs; // Hard coded must change player model item left
   Rx<ItemHuntStatus> itemHuntStatus = ItemHuntStatus.initial.obs;
-  final itemRandomizer =
-      THelperFunctions.generateRandomInt(GeminiClient.maxGeneratedItems).obs;
-  final RxList<int> calledItems = <int>[].obs;
 
-  String get fakeItem => _items[itemLeft.value];
-  String get legitItem => _items[itemRandomizer.value];
+  String get fakeItem => _fakeItems[itemLeft.value];
+  String get legitItem => _items[itemLeft.value - 1];
   String get currentitem => shouldGenerateFakeItems ? fakeItem : legitItem;
 
   // Multiplayer Config
@@ -77,10 +74,12 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   // Local game state && UI
   final isImagePickerShown = false.obs;
   final waitingForOthersOpacity = 1.0.obs;
-  bool _gameStarted = false;
+  final isGameStarted = false.obs;
   RxBool isFinish = false.obs;
   bool get hideFooterButtons {
-    if (itemHuntStatus.value != ItemHuntStatus.initial || isFinish.value || roomInfo.value.gameState == GameState.ended) {
+    if (itemHuntStatus.value != ItemHuntStatus.initial ||
+        isFinish.value ||
+        roomInfo.value.gameState == GameState.ended) {
       return false;
     } else {
       return true;
@@ -125,12 +124,12 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   // Starts checking the room status and updates the UI accordingly
   void _startRoomCheck() {
     _roomSubscription =
-        _roomRepository.roomStream(roomID).listen((roomSnapshot) {
+        _roomRepository.roomStream(roomID).listen((roomSnapshot) async {
       if (!roomSnapshot.exists) {
         _handleRoomClosure();
       } else {
         // Game Starts here
-        _updateRoomInfo(roomSnapshot);
+        await _updateRoomInfo(roomSnapshot);
       }
     }, onError: (error) {
       TLoggerHelper.info('$error');
@@ -149,32 +148,62 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   }
 
   // Update room info and start game if necessary
-  void _updateRoomInfo(DocumentSnapshot<Map<String, dynamic>> roomSnapshot) {
+  Future<void> _updateRoomInfo(DocumentSnapshot<Map<String, dynamic>> roomSnapshot) async {
     roomInfo.value = RoomModel.fromSnapshot(roomSnapshot);
-    if (roomInfo.value.gameState == GameState.progress && !_gameStarted) {
-      _gameStarted = true;
-      _startGame();
+    try {
+      if (roomInfo.value.gameState == GameState.progress && !isGameStarted.value) {
+        await updateItems();
+        _startGame();
+        isGameStarted.value = true;
+        TLoggerHelper.info(isGameStarted.value.toString());
+      } else if (roomInfo.value.gameState == GameState.initial) {
+        isGameStarted.value = false;
+        TLoggerHelper.info(isGameStarted.value.toString());
+        Get.back();
+      }
+    } catch (e) {
+      _handleError(e);
     }
   }
 
-  // Starts the game
-  void _startGame() {
-    TFullScreenLoader.stopLoading();
+  _startGame() {
     Get.offAll(() => const MultiGameScreen());
     TPopup.customToast(message: 'Game Started');
 
-    _generateUniqueItemRandomizer();
-    calledItems.add(itemRandomizer.value);
     _stopwatch.start();
     _startGameTimer();
-    Timer.periodic(1.seconds, (_){
-      waitingForOthersOpacity.value = waitingForOthersOpacity.value == 1.0 ? 0.0 : 1.0;
+    Timer.periodic(1.seconds, (_) {
+      waitingForOthersOpacity.value =
+          waitingForOthersOpacity.value == 1.0 ? 0.0 : 1.0;
     });
 
     everAll(
       [score, itemLeft],
       (_) => _updatePlayerScoreAndItemLeft(),
     );
+  }
+
+  Future<void> updateItems() async {
+    try {
+      TFullScreenLoader.openLoadingDialog('Generating items');
+
+      final response = await GeminiRepository.instance.loadHunt(
+        roomInfo.value.huntLocation,
+      );
+
+      // Randomize items
+      final items = (response.toList()..shuffle(math.Random()))
+          .take(PlayerModel.maxItems)
+          .toList();
+
+      // Update items
+      await _roomRepository.updateItems(roomID, items);
+      _items.addAll(items);
+    } catch (e) {
+      _handleError(e);
+      await _roomRepository.updateGameState(roomID, GameState.initial);
+      rethrow;
+    }
   }
 
   Future<void> _updatePlayerScoreAndItemLeft() async {
@@ -236,23 +265,17 @@ class RoomController extends GetxController with WidgetsBindingObserver {
       if (!shouldGenerateFakeItems) {
         final isAllReady = await _roomRepository.checkIfAllPlayersReady(roomID);
         if (isAllReady) {
-          TFullScreenLoader.openLoadingDialog('Generating Items');
-          final response = await GeminiRepository.instance.loadHunt(
-            roomInfo.value.huntLocation,
-          );
-          _items.addAll(response);
+          // Update game state
           await _roomRepository.updateGameState(roomID, GameState.progress);
         } else {
           TPopup.customToast(message: 'Player(s) are not ready');
         }
       } else {
         TFullScreenLoader.openLoadingDialog('Generating Items');
-        _items.addAll(
+        _fakeItems.addAll(
             ['Remote', 'Cabinet', 'Lamp', 'Lighter', 'Coffe Cup', 'Outlet']);
-        await _roomRepository.updateGameState(roomID, GameState.progress);
       }
     } catch (e) {
-      TFullScreenLoader.stopLoading();
       _handleError(e);
     }
   }
@@ -351,8 +374,6 @@ class RoomController extends GetxController with WidgetsBindingObserver {
     try {
       if (itemLeft.value >= 2) {
         itemLeft.value--;
-        _generateUniqueItemRandomizer();
-        calledItems.add(itemRandomizer.value);
         _resetTimer();
       } else {
         itemLeft.value--;
@@ -367,15 +388,6 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   void incrementScore() {
     final scorePenalty = _stopwatch.elapsedMilliseconds ~/ 3000 * 1;
     score.value += 100 - math.min<int>(scorePenalty, 50);
-  }
-
-  void _generateUniqueItemRandomizer() {
-    int newItem;
-    do {
-      newItem =
-          THelperFunctions.generateRandomInt(GeminiClient.maxGeneratedItems);
-    } while (calledItems.contains(newItem));
-    itemRandomizer.value = newItem;
   }
 
   // Handle generic errors

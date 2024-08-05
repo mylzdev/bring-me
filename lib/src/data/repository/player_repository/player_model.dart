@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PlayerModel {
+  static const int maxItems = 5;
+
   String name;
   bool isLeader;
   bool isReady;
@@ -11,7 +13,7 @@ class PlayerModel {
     this.isLeader = true,
     this.isReady = true,
     this.score = 0,
-    this.itemLeft = 5,
+    this.itemLeft = maxItems,
   });
 
   PlayerModel copyWith({

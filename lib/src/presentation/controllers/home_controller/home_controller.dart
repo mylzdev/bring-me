@@ -48,6 +48,7 @@ class HomeController extends GetxController {
         huntLocation: huntLocation.value,
         gameState: GameState.initial,
         players: [PlayerModel(name: username)],
+        items: ['']
       );
       await RoomRepository.instance.createRoom(room);
 
@@ -70,8 +71,7 @@ class HomeController extends GetxController {
       final updatedRoom = await RoomRepository.instance
           .joinRoom(joinRoomTextController.text, username);
       roomInfo.value = updatedRoom;
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => TFullScreenLoader.stopLoading);
+
       Get.offAll(() => const RoomScreen());
     } catch (e) {
       TLoggerHelper.error(e.toString());

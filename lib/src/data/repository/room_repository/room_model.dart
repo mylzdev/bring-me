@@ -11,6 +11,7 @@ class RoomModel {
   HuntLocation huntLocation;
   List<PlayerModel> players;
   GameState gameState;
+  List<String> items;
 
   RoomModel({
     required this.roomID,
@@ -18,6 +19,7 @@ class RoomModel {
     required this.huntLocation,
     required this.players,
     required this.gameState,
+    required this.items,
   });
 
   static RoomModel empty() => RoomModel(
@@ -26,6 +28,7 @@ class RoomModel {
         huntLocation: HuntLocation.indoor,
         players: [],
         gameState: GameState.initial,
+        items: ['']
       );
 
   // Factory method for creating a RoomModel from a JSON object
@@ -41,6 +44,7 @@ class RoomModel {
             .map((playerData) => PlayerModel.fromMap(playerData))
             .toList(),
         gameState: GameStateExtension.fromString(data['gameState']),
+        items: List<String>.from(data['items'] as List),
       );
     } else {
       return RoomModel.empty();
@@ -55,6 +59,7 @@ class RoomModel {
       'huntLocation': huntLocation.name,
       'players': players.map((e) => e.toMap()).toList(),
       'gameState': gameState.name,
+      'items': items,
     };
   }
 
@@ -72,6 +77,7 @@ class RoomModel {
     List<PlayerModel>? players,
     bool? isAllReady,
     GameState? gameState,
+    List<String>? items,
   }) {
     return RoomModel(
       roomID: roomID ?? this.roomID,
@@ -79,6 +85,7 @@ class RoomModel {
       huntLocation: huntLocation ?? this.huntLocation,
       players: players ?? this.players,
       gameState: gameState ?? this.gameState,
+      items: items ?? this.items,
     );
   }
 }
