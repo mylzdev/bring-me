@@ -48,7 +48,7 @@ class HomeController extends GetxController {
         huntLocation: huntLocation.value,
         gameState: GameState.initial,
         players: [PlayerModel(name: username)],
-        items: ['']
+        items: []
       );
       await RoomRepository.instance.createRoom(room);
 

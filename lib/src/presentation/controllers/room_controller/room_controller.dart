@@ -74,7 +74,6 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   // Local game state && UI
   final isImagePickerShown = false.obs;
   final waitingForOthersOpacity = 1.0.obs;
-  final isGameStarted = false.obs;
   RxBool isFinish = false.obs;
   bool get hideFooterButtons {
     if (itemHuntStatus.value != ItemHuntStatus.initial ||
@@ -148,39 +147,39 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   }
 
   // Update room info and start game if necessary
-  Future<void> _updateRoomInfo(DocumentSnapshot<Map<String, dynamic>> roomSnapshot) async {
+  Future<void> _updateRoomInfo(
+      DocumentSnapshot<Map<String, dynamic>> roomSnapshot) async {
     roomInfo.value = RoomModel.fromSnapshot(roomSnapshot);
-    try {
-      if (roomInfo.value.gameState == GameState.progress && !isGameStarted.value) {
-        await updateItems();
-        _startGame();
-        isGameStarted.value = true;
-        TLoggerHelper.info(isGameStarted.value.toString());
-      } else if (roomInfo.value.gameState == GameState.initial) {
-        isGameStarted.value = false;
-        TLoggerHelper.info(isGameStarted.value.toString());
-        Get.back();
-      }
-    } catch (e) {
-      _handleError(e);
+    if (roomInfo.value.gameState == GameState.progress &&
+        roomInfo.value.items.isEmpty) {
+      _startGame();
+    } else if (roomInfo.value.gameState == GameState.initial) {
+      Get.back();
     }
   }
 
-  _startGame() {
-    Get.offAll(() => const MultiGameScreen());
-    TPopup.customToast(message: 'Game Started');
+  Future<void> _startGame() async {
+    try {
+      await updateItems(); // Back to room screen if throws an exception
 
-    _stopwatch.start();
-    _startGameTimer();
-    Timer.periodic(1.seconds, (_) {
-      waitingForOthersOpacity.value =
-          waitingForOthersOpacity.value == 1.0 ? 0.0 : 1.0;
-    });
+      Get.offAll(() => const MultiGameScreen());
+      TPopup.customToast(message: 'Game Started');
 
-    everAll(
-      [score, itemLeft],
-      (_) => _updatePlayerScoreAndItemLeft(),
-    );
+      _stopwatch.start();
+      _startGameTimer();
+      Timer.periodic(1.seconds, (_) {
+        waitingForOthersOpacity.value =
+            waitingForOthersOpacity.value == 1.0 ? 0.0 : 1.0;
+      });
+
+      everAll(
+        [score, itemLeft],
+        (_) => _updatePlayerScoreAndItemLeft(),
+      );
+    } catch (e) {
+      _handleError(e);
+      rethrow;
+    }
   }
 
   Future<void> updateItems() async {
