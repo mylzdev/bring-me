@@ -160,8 +160,11 @@ class MultiGameScreen extends GetView<RoomController> {
         ),
         bottomNavigationBar: Obx(
           () => Visibility(
-              visible: controller.hideFooterButtons,
-              child: TMultiGameFooter(controller: controller)),
+            visible: controller.roomInfo.value.gameState == GameState.ended
+                ? true
+                : controller.hideFooterButtons,
+            child: TMultiGameFooter(controller: controller),
+          ),
         ),
       ),
     );

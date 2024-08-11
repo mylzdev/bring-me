@@ -46,7 +46,7 @@ class PlayerRepository extends GetxService {
 
   Future<void> saveUsername(PlayerModel user) async {
     try {
-      final userRef = _db.collection('Users').doc(user.name);
+      final userRef = _db.collection('Users').doc(user.username);
       final userSnapshot = await userRef.get();
 
       if (userSnapshot.exists) {
@@ -65,6 +65,52 @@ class PlayerRepository extends GetxService {
         throw 'Username already taken';
       }
       throw 'Something went wrong. Please try again: $e';
+    }
+  }
+
+  Future<void> updateSingleGameScore(int singleGameScore) async {
+    try {
+      final userRef = _db.collection('Users').doc(username.value);
+      final playerSnapshot = await userRef.get();
+
+      PlayerModel player = PlayerModel.fromSnapshot(playerSnapshot);
+      int updatedSingleHighscore = player.singleGameScore > singleGameScore
+          ? player.singleGameScore
+          : singleGameScore;
+      player = player.copyWith(singleGameScore: updatedSingleHighscore);
+
+      await userRef.update(player.toMap());
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Error while updating to player single high score: $e';
+    }
+  }
+
+  Future<void> updateMultiGameScore(int mulitGameScore) async {
+    try {
+      final userRef = _db.collection('Users').doc(username.value);
+      final playerSnapshot = await userRef.get();
+
+      PlayerModel player = PlayerModel.fromSnapshot(playerSnapshot);
+      int updatedSingleHighscore = player.singleGameScore > mulitGameScore
+          ? player.multiGameScore
+          : mulitGameScore;
+      player = player.copyWith(multiGameScore: updatedSingleHighscore);
+
+      await userRef.update(player.toMap());
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Error while updating to player single high score: $e';
     }
   }
 

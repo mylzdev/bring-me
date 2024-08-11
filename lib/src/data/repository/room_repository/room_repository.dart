@@ -1,6 +1,6 @@
 import 'package:bring_me/src/core/config/enums.dart';
-import 'package:bring_me/src/data/repository/player_repository/player_model.dart';
 import 'package:bring_me/src/data/repository/room_repository/room_model.dart';
+import 'package:bring_me/src/data/repository/room_repository/room_player_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -43,7 +43,7 @@ class RoomRepository extends GetxService {
       }
 
       room.players.add(
-        PlayerModel(
+        RoomPlayerModel(
           name: playerUsername,
           isLeader: false,
           isReady: false,

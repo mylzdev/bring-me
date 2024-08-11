@@ -56,7 +56,7 @@ class GeminiClient {
         'Generate a 50 unique and memorable username. It should be short, easy to remember,'
         'and preferably not already taken. Consider using a combination of words, numbers, symbols'
         'It should not have any spaces or emoticons and preferably not taken'
-        'The username should be at least 3 characters short and will not exceed to 15 characters'
+        'The username should be at least 3 characters short and will not exceed to 10 characters'
         'Do not add this ```json or anything at the start of your result'
         'Provide your response as a JSON object with the following schema: {"items": ["", "", ...]}.'
         'Do not return your result as Markdown.';

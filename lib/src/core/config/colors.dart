@@ -7,10 +7,7 @@ class TColors {
   static const Color accent = Color(0xFFb0c7ff);
 
   // Container colors
-  static const Color containerBlue = Color(0xFFDCEDF9);
-  static const Color containerPink = Color(0xFFFDD6CE);
-  static const Color containerGreen = Color(0xFFE9F9DC);
-  static const Color containerYellow = Color(0xFFFCEDCA);
+  static const Color containerPrimary = Color.fromARGB(255, 47, 115, 203);
 
   // Text colors
   static const Color textPrimary = Color(0xFF333333);

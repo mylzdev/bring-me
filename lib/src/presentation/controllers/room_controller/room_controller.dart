@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../data/repository/gemini_repository/gemini_repository.dart';
-import '../../../data/repository/player_repository/player_model.dart';
+import '../../../data/repository/room_repository/room_player_model.dart';
 import '../../../data/services/photo_picker/photo_picker_service.dart';
 
 class RoomController extends GetxController with WidgetsBindingObserver {
@@ -42,8 +42,8 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   // Items
   final _items = RxList<String>();
   final _fakeItems = RxList<String>();
-  final itemLeft =
-      PlayerModel.maxItems.obs; // Hard coded must change player model item left
+  final itemLeft = RoomPlayerModel
+      .maxItems.obs; // Hard coded must change player model item left
   Rx<ItemHuntStatus> itemHuntStatus = ItemHuntStatus.initial.obs;
 
   String get fakeItem => _fakeItems[itemLeft.value];
@@ -53,7 +53,18 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   // Multiplayer Config
   Rx<RoomModel> roomInfo = RoomModel.empty().obs;
   String get roomID => roomInfo.value.roomID;
-  List<PlayerModel> get sortedPlayer => roomInfo.value.players.toList()
+  bool get isDraw {
+    final highestScore = sortedPlayer.first;
+
+    if (sortedPlayer.length == 1) {
+      return false;
+    }
+
+    return roomInfo.value.players
+        .every((player) => player.score == highestScore.score);
+  }
+
+  List<RoomPlayerModel> get sortedPlayer => roomInfo.value.players.toList()
     ..sort(
       (a, b) => b.score.compareTo(a.score),
     );
@@ -72,13 +83,14 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _roomSubscription;
 
   // Local game state && UI
+  final isPlayReadyTapped = false.obs;
+  void onPlayReadyTapped() =>
+      isPlayReadyTapped.value = !isPlayReadyTapped.value;
   final isImagePickerShown = false.obs;
   final waitingForOthersOpacity = 1.0.obs;
   RxBool isFinish = false.obs;
   bool get hideFooterButtons {
-    if (itemHuntStatus.value != ItemHuntStatus.initial ||
-        isFinish.value ||
-        roomInfo.value.gameState == GameState.ended) {
+    if (itemHuntStatus.value != ItemHuntStatus.initial || isFinish.value) {
       return false;
     } else {
       return true;
@@ -97,7 +109,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   @override
   void onClose() async {
     WidgetsBinding.instance.removeObserver(this);
-    await _roomSubscription?.cancel();
+    _roomSubscription?.cancel();
     _stopwatch.stop();
     super.onClose();
   }
@@ -125,7 +137,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
     _roomSubscription =
         _roomRepository.roomStream(roomID).listen((roomSnapshot) async {
       if (!roomSnapshot.exists) {
-        _handleRoomClosure();
+        handleRoomClosure();
       } else {
         // Game Starts here
         await _updateRoomInfo(roomSnapshot);
@@ -136,14 +148,12 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   }
 
   // Handle room closure
-  void _handleRoomClosure() {
-    _roomSubscription?.cancel();
-    Get.offAll(() => const HomeScreen());
-    Get.delete<RoomController>(force: true);
+  void handleRoomClosure() {
     if (!isRoomLeader) {
       TPopup.warningSnackbar(
           title: TTexts.ohSnap, message: 'The room owner left the room');
     }
+    Get.offAll(() => const HomeScreen());
   }
 
   // Update room info and start game if necessary
@@ -153,31 +163,28 @@ class RoomController extends GetxController with WidgetsBindingObserver {
     if (roomInfo.value.gameState == GameState.progress &&
         roomInfo.value.items.isEmpty) {
       _startGame();
-    } else if (roomInfo.value.gameState == GameState.initial) {
-      Get.back();
     }
   }
 
   Future<void> _startGame() async {
     try {
-      await updateItems(); // Back to room screen if throws an exception
-
+      await updateItems();
       Get.offAll(() => const MultiGameScreen());
       TPopup.customToast(message: 'Game Started');
 
-      _stopwatch.start();
       _startGameTimer();
       Timer.periodic(1.seconds, (_) {
         waitingForOthersOpacity.value =
             waitingForOthersOpacity.value == 1.0 ? 0.0 : 1.0;
       });
 
+      // Rx listeners
       everAll(
         [score, itemLeft],
         (_) => _updatePlayerScoreAndItemLeft(),
       );
     } catch (e) {
-      _handleError(e);
+      _handleError(e, '_startGame');
       rethrow;
     }
   }
@@ -192,15 +199,16 @@ class RoomController extends GetxController with WidgetsBindingObserver {
 
       // Randomize items
       final items = (response.toList()..shuffle(math.Random()))
-          .take(PlayerModel.maxItems)
+          .take(RoomPlayerModel.maxItems)
           .toList();
 
       // Update items
       await _roomRepository.updateItems(roomID, items);
       _items.addAll(items);
     } catch (e) {
-      _handleError(e);
+      _handleError(e, 'update items');
       await _roomRepository.updateGameState(roomID, GameState.initial);
+      TFullScreenLoader.stopLoading();
       rethrow;
     }
   }
@@ -213,6 +221,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
         score.value,
         itemLeft.value,
       );
+      checkIfAllPlayersDone();
       TLoggerHelper.info('Score: ${score.value}, Item left: ${itemLeft.value}');
     } catch (e) {
       TLoggerHelper.error(e.toString());
@@ -221,14 +230,16 @@ class RoomController extends GetxController with WidgetsBindingObserver {
 
   // Starts game timer && Game Ends
   void _startGameTimer() {
+    _stopwatch.start();
     timer = Timer.periodic(const Duration(seconds: 1), (_) async {
       timeLeft.value--;
-      if (timeLeft.value == 0) {
+      if (timeLeft.value <= 0) {
         if (isImagePickerShown.value) {
-          TLoggerHelper.info('message');
+          TLoggerHelper.info('message'); // TODO : Fix this
         }
         timer!.cancel();
         await endGame();
+        TLoggerHelper.info('END GAME');
       }
     });
   }
@@ -238,16 +249,17 @@ class RoomController extends GetxController with WidgetsBindingObserver {
       if (isRoomLeader) {
         await _roomRepository.deleteRoom(roomID);
       } else {
+        // TODO : Loader & saving data
         Get.offAll(() => const HomeScreen());
-        Get.delete<RoomController>(force: true);
         await _roomRepository.removePlayerFromRoom(roomID, _playerName);
       }
     } catch (e) {
-      _handleError(e);
+      _handleError(e, 'Quit Room');
     }
   }
 
   Future<void> setReady() async {
+    onPlayReadyTapped();
     try {
       await _roomRepository.updatePlayerReadyState(
         roomID,
@@ -255,48 +267,61 @@ class RoomController extends GetxController with WidgetsBindingObserver {
         isReady.value = !isReady.value,
       );
     } catch (e) {
-      _handleError(e);
+      _handleError(e, 'Set Ready');
     }
   }
 
   Future<void> startGame() async {
+    onPlayReadyTapped();
     try {
       if (!shouldGenerateFakeItems) {
         final isAllReady = await _roomRepository.checkIfAllPlayersReady(roomID);
         if (isAllReady) {
+          // TODO : should add this : && roomInfo.value.players.length > 1
           // Update game state
           await _roomRepository.updateGameState(roomID, GameState.progress);
         } else {
-          TPopup.customToast(message: 'Player(s) are not ready');
+          if (roomInfo.value.players.length > 1) {
+            TPopup.customToast(message: 'Player(s) are not ready');
+          } else {
+            TPopup.warningSnackbar(
+                title: 'Invite a fren', message: 'At least 2 player to start');
+          }
         }
       } else {
         TFullScreenLoader.openLoadingDialog('Generating Items');
         _fakeItems.addAll(
             ['Remote', 'Cabinet', 'Lamp', 'Lighter', 'Coffe Cup', 'Outlet']);
+        await _roomRepository.updateGameState(roomID, GameState.progress);
       }
     } catch (e) {
-      _handleError(e);
+      _handleError(e, 'Start Game');
     }
   }
 
   Future<void> endGame() async {
     try {
+      await Future.delayed(const Duration(milliseconds: 1500));
       await _roomRepository.updateGameState(roomID, GameState.ended);
-      await Future.delayed(1.seconds);
     } catch (e) {
       TLoggerHelper.error(e.toString());
     }
   }
 
-  void onLeaveRoom() async {
-    await Get.defaultDialog(
+  void checkIfAllPlayersDone() {
+    final done = roomInfo.value.players.every((player) => player.itemLeft == 0);
+    if (done) timeLeft.value = 0;
+  }
+
+  void onLeaveRoom() {
+    Get.defaultDialog(
       title:
           isRoomLeader ? 'The room will be dismissed' : 'Confirm leaving room',
       middleText: 'Are you sure you want to leave the room?',
       contentPadding: EdgeInsets.all(TSizes.defaultSpace),
       titlePadding: EdgeInsets.only(top: TSizes.defaultSpace),
       confirm: ElevatedButton(
-        onPressed: () async => await quitRoom(),
+        onPressed: () => quitRoom(),
         style: ElevatedButton.styleFrom(
             backgroundColor: TColors.error,
             padding: EdgeInsets.zero,
@@ -346,6 +371,8 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   void _handleSuccessfulImageValidation() async {
     incrementScore();
     itemHuntStatus.value = ItemHuntStatus.validationSuccess;
+    await Future.delayed(Durations
+        .short1); // short delay so that the itemLeft and score doesn't race in firebase
     skipItem();
     _resetTimer();
   }
@@ -390,8 +417,8 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   }
 
   // Handle generic errors
-  void _handleError(Object e) {
-    TLoggerHelper.error(e.toString());
+  void _handleError(Object e, String methodName) {
+    TLoggerHelper.error('Error at [$methodName] : $e');
     TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
   }
 }

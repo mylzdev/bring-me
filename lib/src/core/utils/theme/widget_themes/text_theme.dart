@@ -10,13 +10,13 @@ class TTextTheme {
 
   /// Customizable Dark Text Theme
   static TextTheme darkTextTheme = TextTheme(
-    displayLarge: GoogleFonts.playfair().copyWith(fontSize: 96.0.sp, fontWeight: FontWeight.normal, color: TColors.light),
-    displayMedium: GoogleFonts.playfair().copyWith(fontSize: 60.0.sp, fontWeight: FontWeight.normal, color: TColors.light),
-    displaySmall: GoogleFonts.playfair().copyWith(fontSize: 48.0.sp, fontWeight: FontWeight.normal, color: TColors.light),
+    displayLarge: GoogleFonts.blackHanSans().copyWith(fontSize: 54.0.sp, fontWeight: FontWeight.normal, color: TColors.light),
+    displayMedium: GoogleFonts.blackHanSans().copyWith(fontSize: 48.0.sp, fontWeight: FontWeight.normal, color: TColors.light),
+    displaySmall: GoogleFonts.blackHanSans().copyWith(fontSize: 40.0.sp, fontWeight: FontWeight.normal, color: TColors.light),
 
-    headlineLarge: GoogleFonts.poppins().copyWith(fontSize: 32.0.sp, fontWeight: FontWeight.bold, color: TColors.light),
-    headlineMedium: GoogleFonts.poppins().copyWith(fontSize: 24.0.sp, fontWeight: FontWeight.w600, color: TColors.light),
-    headlineSmall: GoogleFonts.poppins().copyWith(fontSize: 18.0.sp, fontWeight: FontWeight.w600, color: TColors.light),
+    headlineLarge: GoogleFonts.blackHanSans().copyWith(fontSize: 32.0.sp, fontWeight: FontWeight.normal, color: TColors.light),
+    headlineMedium: GoogleFonts.blackHanSans().copyWith(fontSize: 24.0.sp, fontWeight: FontWeight.normal, color: TColors.light),
+    headlineSmall: GoogleFonts.blackHanSans().copyWith(fontSize: 18.0.sp, fontWeight: FontWeight.normal, color: TColors.light),
 
     titleLarge: GoogleFonts.poppins().copyWith(fontSize: 16.0.sp, fontWeight: FontWeight.w600, color: TColors.light),
     titleMedium: GoogleFonts.poppins().copyWith(fontSize: 16.0.sp, fontWeight: FontWeight.w500, color: TColors.light),

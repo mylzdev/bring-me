@@ -9,11 +9,13 @@ import '../button/elevated_gradient_button.dart';
 import '../button/outline_gradient_button.dart';
 
 class CustomDialog {
-  static void show(
-      {VoidCallback? onRetry,
-      VoidCallback? onContinue,
-      required String title,
-      required String lottie}) {
+  static void show({
+    VoidCallback? onRetry,
+    VoidCallback? onContinue,
+    required String title,
+    String subtitle = '',
+    required String lottie,
+  }) {
     Get.defaultDialog(
       barrierDismissible: false,
       backgroundColor: TColors.darkContainer,
@@ -37,11 +39,14 @@ class CustomDialog {
             style: Get.textTheme.titleLarge,
           ),
           SizedBox(height: TSizes.spaceBtwItems / 2),
-          const Text(
-            'data asdsad as dasd as das dasd as das dasd asdsadasdas asdasdas asd asd',
-            textAlign: TextAlign.center,
+          Visibility(
+            visible: subtitle != '',
+            child: Text(
+              subtitle,
+              textAlign: TextAlign.center,
+            ),
           ),
-          SizedBox(height: TSizes.spaceBtwSections),
+          SizedBox(height: TSizes.spaceBtwItems / 2),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

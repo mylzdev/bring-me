@@ -1,10 +1,10 @@
-import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
 import '../../../../core/config/colors.dart';
 import '../../../../core/config/sizes.dart';
+import '../avatar_selection.dart';
 
 class TWelcomeFooter extends StatelessWidget {
   const TWelcomeFooter({
@@ -17,7 +17,10 @@ class TWelcomeFooter extends StatelessWidget {
       bottom: Get.bottomBarHeight + 20,
       left: 0,
       child: GestureDetector(
-        onTap: () async => await PlayerController.instance.navigateToAuth(),
+        onTap: () => Get.to(
+          () => const AvatarSelection(),
+          transition: Transition.rightToLeft,
+        ),
         child: Container(
           width: TSizes.iconLg * 2,
           height: TSizes.iconLg * 2,

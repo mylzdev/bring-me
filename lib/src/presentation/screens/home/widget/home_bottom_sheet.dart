@@ -132,7 +132,7 @@ class THomeBottomSheet {
                       () => SfSlider(
                         value: controller.maxPlayers.value,
                         min: 2,
-                        max: 5,
+                        max: 4,
                         interval: 1,
                         showLabels: true,
                         stepSize: 1,

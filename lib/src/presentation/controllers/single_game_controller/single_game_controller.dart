@@ -3,18 +3,20 @@ import 'dart:math' as math;
 import 'package:bring_me/src/core/common/widgets/dialog/custom_dialog.dart';
 import 'package:bring_me/src/core/config/lottie.dart';
 import 'package:bring_me/src/core/config/text_strings.dart';
-import 'package:bring_me/src/core/utils/helpers/helper_functions.dart';
+import 'package:bring_me/src/core/utils/device/local_storage_key.dart';
 import 'package:bring_me/src/core/utils/popups/popups.dart';
+import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
 import 'package:bring_me/src/presentation/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../../core/config/colors.dart';
 import '../../../core/config/enums.dart';
 import '../../../core/config/sizes.dart';
 import '../../../core/utils/logging/logger.dart';
-import '../../../data/repository/gemini_repository/gemini_client.dart';
 import '../../../data/repository/gemini_repository/gemini_repository.dart';
+import '../../../data/repository/room_repository/room_player_model.dart';
 import '../../../data/services/photo_picker/photo_picker_service.dart';
 import '../home_controller/home_controller.dart';
 
@@ -22,6 +24,9 @@ class SingleGameController extends GetxController {
   static SingleGameController get instance => Get.find();
   SingleGameController(this.homeController);
   final HomeController homeController;
+
+  final _playerController = PlayerController.instance;
+  final _localStorage = GetStorage();
 
   final _photoPickerService = PhotoPickerService();
   final _stopwatch = Stopwatch();
@@ -32,15 +37,14 @@ class SingleGameController extends GetxController {
 
   // Score
   final score = 0.obs;
+  final highscore = 0.obs;
 
   // Items
-  final itemRandomizer =
-      THelperFunctions.generateRandomInt(GeminiClient.maxGeneratedItems).obs;
-  final itemLeft = 5.obs;
+
+  final itemLeft = RoomPlayerModel.maxItems.obs;
   final _items = <String>[].obs;
   Rx<ItemHuntStatus> itemHuntStatus = ItemHuntStatus.initial.obs;
-  final RxList<int> calledItems = <int>[].obs;
-  String get currentitem => _items[itemRandomizer.value];
+  String get currentitem => _items[itemLeft.value - 1];
 
   bool get hideFooterButtons {
     if (itemHuntStatus.value != ItemHuntStatus.initial ||
@@ -54,13 +58,18 @@ class SingleGameController extends GetxController {
 
   @override
   void onInit() {
-    _generateUniqueItemRandomizer();
-    calledItems.add(itemRandomizer.value);
+    setHighScore();
     _stopwatch.start();
     huntLocation.value = homeController.huntLocation.value;
     homeController.gameState.listen((status) => gameState.value = status);
     homeController.items.listen((i) => _items.value = i);
     super.onInit();
+  }
+
+  void setHighScore() {
+    _localStorage.writeIfNull(TLocalStorageKey.singleGameHighScore, 0);
+    final hs = _localStorage.read(TLocalStorageKey.singleGameHighScore);
+    highscore.value = hs;
   }
 
   @override
@@ -69,35 +78,50 @@ class SingleGameController extends GetxController {
     super.onClose();
   }
 
-  void skipItem() {
+  void skipItem() async {
     try {
       if (itemLeft.value >= 2) {
         itemLeft.value--;
-        _generateUniqueItemRandomizer();
-        calledItems.add(itemRandomizer.value);
         _resetTimer();
       } else {
         itemLeft.value--;
-        gameState.value = GameState.ended;
-
-        String lottie;
-        if (score >= 400) {
-          lottie = LottieAsset.great;
-        } else if (score > 300 && score < 400) {
-          lottie = LottieAsset.good;
-        } else {
-          lottie = LottieAsset.meh;
-        }
-        CustomDialog.show(
-          title: 'Final Score: ${score.value}',
-          lottie: lottie,
-          onRetry: retry,
-          onContinue: () => Get.offAll(() => const HomeScreen()),
-        );
+        gameEnds();
       }
     } catch (e) {
-      rethrow;
+      TLoggerHelper.error(e.toString());
     }
+  }
+
+  void gameEnds() async {
+    gameState.value = GameState.ended;
+
+    bool isNewHighScore = false;
+    if (score.value > highscore.value) {
+      _localStorage.write(TLocalStorageKey.singleGameHighScore, score.value);
+      isNewHighScore = true;
+    }
+
+    CustomDialog.show(
+      title: isNewHighScore
+          ? 'New High Score: ${score.value}'
+          : 'Final Score ${score.value}',
+      lottie: getLottieBaseScore(score.value),
+      onRetry: retry,
+      onContinue: () => Get.offAll(() => const HomeScreen()),
+    );
+    await _playerController.updateSingleHighScore(score.value);
+  }
+
+  String getLottieBaseScore(int score) {
+    String lottie;
+    if (score >= 400) {
+      lottie = LottieAsset.great;
+    } else if (score > 300 && score < 400) {
+      lottie = LottieAsset.good;
+    } else {
+      lottie = LottieAsset.meh;
+    }
+    return lottie;
   }
 
   Future<void> validateImage() async {
@@ -135,26 +159,22 @@ class SingleGameController extends GetxController {
     _stopwatch.start();
   }
 
-  void _generateUniqueItemRandomizer() {
-    int newItem;
-    do {
-      newItem =
-          THelperFunctions.generateRandomInt(GeminiClient.maxGeneratedItems);
-    } while (calledItems.contains(newItem));
-    itemRandomizer.value = newItem;
-  }
-
   void retry() async {
     try {
       score.value = 0;
       itemLeft.value = 5;
-      calledItems.clear();
       _items.clear();
       CustomDialog.close();
       gameState.value = GameState.initial;
+
       final response =
           await GeminiRepository.instance.loadHunt(huntLocation.value);
-      _items.value = response;
+      // Randomize items
+      final shuffledItems = (response.toList()..shuffle(math.Random()))
+          .take(RoomPlayerModel.maxItems)
+          .toList();
+      _items.value = shuffledItems;
+
       gameState.value = GameState.progress;
     } catch (e) {
       Get.offAll(() => const HomeScreen());

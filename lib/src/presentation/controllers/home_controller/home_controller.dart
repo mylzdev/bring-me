@@ -1,7 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:bring_me/src/core/utils/popups/loader.dart';
-import 'package:bring_me/src/data/repository/player_repository/player_model.dart';
 import 'package:bring_me/src/data/repository/player_repository/player_repository.dart';
 import 'package:bring_me/src/data/repository/room_repository/room_model.dart';
+import 'package:bring_me/src/data/repository/room_repository/room_player_model.dart';
 import 'package:bring_me/src/data/repository/room_repository/room_repository.dart';
 import 'package:bring_me/src/presentation/screens/home/home.dart';
 import 'package:flutter/material.dart';
@@ -15,13 +17,13 @@ import '../../../core/utils/popups/popups.dart';
 import '../../../data/repository/gemini_repository/gemini_repository.dart';
 import '../../screens/room/room.dart';
 import '../../screens/single_game/single_game_screen.dart';
+import '../room_controller/room_controller.dart';
 
 class HomeController extends GetxController {
   static HomeController get instance => Get.find();
 
   final username = PlayerRepository.instance.username.value;
 
-  final isSinglePlayer = true.obs;
   final roomID = '12345'.obs;
   final maxPlayers = 2.0.obs;
   final items = RxList<String>();
@@ -37,19 +39,24 @@ class HomeController extends GetxController {
   void setMaxUser(double value) => maxPlayers.value = value;
   void setHuntLocation(HuntLocation location) => huntLocation.value = location;
 
+  @override
+  void onInit() {
+    Get.delete<RoomController>(force: true);
+    super.onInit();
+  }
+
   Future<void> createRoom() async {
     try {
       TFullScreenLoader.openLoadingDialog('Creating room');
       roomID.value = THelperFunctions.generateRoomID();
 
       final room = RoomModel(
-        roomID: roomID.value,
-        maxPlayers: maxPlayers.value.floor(),
-        huntLocation: huntLocation.value,
-        gameState: GameState.initial,
-        players: [PlayerModel(name: username)],
-        items: []
-      );
+          roomID: roomID.value,
+          maxPlayers: maxPlayers.value.floor(),
+          huntLocation: huntLocation.value,
+          gameState: GameState.initial,
+          players: [RoomPlayerModel(name: username)],
+          items: []);
       await RoomRepository.instance.createRoom(room);
 
       roomInfo.value = room;
@@ -86,8 +93,14 @@ class HomeController extends GetxController {
       Get.offAll(() => const GameScreen());
       final response =
           await GeminiRepository.instance.loadHunt(huntLocation.value);
+
+      // Randomize items
+      final shuffledItems = (response.toList()..shuffle(math.Random()))
+          .take(RoomPlayerModel.maxItems)
+          .toList();
+
+      items.addAll(shuffledItems);
       gameState.value = GameState.progress;
-      items.addAll(response);
     } catch (e) {
       Get.to(() => const HomeScreen());
       TLoggerHelper.error(e.toString());

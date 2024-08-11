@@ -3,8 +3,8 @@ import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/config/colors.dart';
-import '../../../../data/repository/player_repository/player_model.dart';
 import '../../../../data/repository/player_repository/player_repository.dart';
+import '../../../../data/repository/room_repository/room_player_model.dart';
 
 class TPlacingBadge extends StatelessWidget {
   const TPlacingBadge({
@@ -13,7 +13,7 @@ class TPlacingBadge extends StatelessWidget {
     required this.index,
   });
 
-  final List<PlayerModel> sortedPlayers;
+  final List<RoomPlayerModel> sortedPlayers;
   final int index;
 
   @override

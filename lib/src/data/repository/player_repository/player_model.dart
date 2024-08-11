@@ -1,57 +1,50 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PlayerModel {
-  static const int maxItems = 5;
-
-  String name;
-  bool isLeader;
-  bool isReady;
-  int score;
-  int itemLeft;
+  final String username;
+  final int avatarIndex;
+  final int multiGameScore;
+  final int singleGameScore;
   PlayerModel({
-    required this.name,
-    this.isLeader = true,
-    this.isReady = true,
-    this.score = 0,
-    this.itemLeft = maxItems,
+    required this.username,
+    required this.avatarIndex,
+    this.multiGameScore = 0,
+    this.singleGameScore = 0,
   });
 
   PlayerModel copyWith({
-    String? id,
-    String? name,
-    bool? isLeader,
-    bool? isReady,
-    int? score,
-    int? itemLeft,
+    String? username,
+    int? avatarIndex,
+    int? multiGameScore,
+    int? singleGameScore,
   }) {
     return PlayerModel(
-      name: name ?? this.name,
-      isLeader: isLeader ?? this.isLeader,
-      isReady: isReady ?? this.isReady,
-      score: score ?? this.score,
-      itemLeft: itemLeft ?? this.itemLeft,
+      username: username ?? this.username,
+      avatarIndex: avatarIndex ?? this.avatarIndex,
+      multiGameScore: multiGameScore ?? this.multiGameScore,
+      singleGameScore: singleGameScore ?? this.singleGameScore,
     );
   }
 
-  static PlayerModel empty() => PlayerModel(name: '');
+  static PlayerModel empty() => PlayerModel(username: '', avatarIndex: 0);
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'name': name,
-      'isLeader': isLeader,
-      'isReady': isReady,
-      'score': score,
-      'itemLeft': itemLeft,
+      'username': username,
+      'avatarIndex': avatarIndex,
+      'multiGameScore': multiGameScore,
+      'singleGameScore': singleGameScore,
     };
   }
 
   factory PlayerModel.fromMap(Map<String, dynamic> map) {
     return PlayerModel(
-      name: map['name'] as String,
-      isLeader: map['isLeader'] as bool,
-      isReady: map['isReady'] as bool,
-      score: map['score'] as int,
-      itemLeft: map['itemLeft'] as int,
+      username: map['username'] as String,
+      avatarIndex: map['avatarIndex'] as int,
+      multiGameScore: map['multiGameScore'] as int,
+      singleGameScore: map['singleGameScore'] as int,
     );
   }
 
@@ -60,18 +53,23 @@ class PlayerModel {
     if (document.exists) {
       final data = document.data()!;
       return PlayerModel(
-        name: data['name'] as String,
-        isLeader: data['isLeader'] as bool,
-        isReady: data['isReady'] as bool,
-        score: data['score'] as int,
-        itemLeft: data['itemLeft'] as int,
+        username: data['username'] as String,
+        avatarIndex: data['avatarIndex'] as int,
+        multiGameScore: data['multiGameScore'] as int,
+        singleGameScore: data['singleGameScore'] as int,
       );
     } else {
       return PlayerModel.empty();
     }
   }
 
+  String toJson() => json.encode(toMap());
+
+  factory PlayerModel.fromJson(String source) =>
+      PlayerModel.fromMap(json.decode(source) as Map<String, dynamic>);
+
   @override
-  String toString() =>
-      'User(name: $name, isLeader: $isLeader, isReady: $isReady, Score: $score)';
+  String toString() {
+    return 'PlayerModel(username: $username, avatarIndex: $avatarIndex, multiGameScore: $multiGameScore, singleGameScore: $singleGameScore)';
+  }
 }

@@ -1,6 +1,6 @@
 import 'package:bring_me/src/core/utils/extensions/game_state_extension.dart';
 import 'package:bring_me/src/core/utils/extensions/hunt_location_extension.dart';
-import 'package:bring_me/src/data/repository/player_repository/player_model.dart';
+import 'package:bring_me/src/data/repository/room_repository/room_player_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../core/config/enums.dart';
@@ -9,7 +9,7 @@ class RoomModel {
   String roomID;
   int maxPlayers;
   HuntLocation huntLocation;
-  List<PlayerModel> players;
+  List<RoomPlayerModel> players;
   GameState gameState;
   List<String> items;
 
@@ -41,7 +41,7 @@ class RoomModel {
         maxPlayers: data['maxPlayers'] as int,
         huntLocation: HuntLocationExtension.fromString(data['huntLocation']),
         players: (data['players'] as List)
-            .map((playerData) => PlayerModel.fromMap(playerData))
+            .map((playerData) => RoomPlayerModel.fromMap(playerData))
             .toList(),
         gameState: GameStateExtension.fromString(data['gameState']),
         items: List<String>.from(data['items'] as List),
@@ -74,7 +74,7 @@ class RoomModel {
     String? roomID,
     int? maxPlayers,
     HuntLocation? huntLocation,
-    List<PlayerModel>? players,
+    List<RoomPlayerModel>? players,
     bool? isAllReady,
     GameState? gameState,
     List<String>? items,

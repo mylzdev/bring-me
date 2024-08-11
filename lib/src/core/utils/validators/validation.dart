@@ -2,8 +2,8 @@ class TValidator {
   static String? validateNickname(String? fieldName, String? value) {
     if (value == null || value.isEmpty) {
       return '$fieldName is required';
-    } else if (value.length >= 15) {
-      return 'Username should not exceed at 15 characters';
+    } else if (value.length >= 10) {
+      return 'Username should not exceed at 10 characters';
     } else if (value.length < 3) {
       return 'Username should be at least 3 characters';
     }

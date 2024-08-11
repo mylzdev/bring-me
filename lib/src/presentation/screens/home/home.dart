@@ -1,14 +1,16 @@
+import 'package:bring_me/src/core/common/widgets/avatar/avatar.dart';
 import 'package:bring_me/src/presentation/controllers/home_controller/home_binding.dart';
+import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:ionicons/ionicons.dart';
 
-import '../../../core/common/widgets/appbar/appbar.dart';
 import '../../../core/config/sizes.dart';
 import '../../controllers/home_controller/home_controller.dart';
-import 'widget/home_bottom_sheet.dart';
-import 'widget/home_card.dart';
-import 'widget/multiplayer_bottom_sheet.dart';
+import 'widget/home_footer.dart';
+import 'widget/home_player_buttons.dart';
+import 'widget/home_player_score.dart';
 
 class HomeScreen extends GetView<HomeController> {
   const HomeScreen({super.key});
@@ -16,43 +18,60 @@ class HomeScreen extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     HomeBinding().dependencies();
+    final playerController = PlayerController.instance;
     return Scaffold(
-      appBar: TAppbar(title: Text(controller.username)),
       body: Padding(
         padding: EdgeInsets.all(TSizes.spaceBtwSections),
         child: SizedBox(
           width: double.maxFinite,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 200.h,
-                child: Row(
+              SizedBox(height: TSizes.spaceBtwSections),
+              // Avatar
+              Obx(
+                () => TAvatar(
+                  avatar: playerController.playerAvatar,
+                  height: 120.h,
+                  width: 120.w,
+                  name: controller.username,
+                  shouldGlow: true,
+                  isSelected: true,
+                  textStyle: Theme.of(context)
+                      .textTheme
+                      .titleLarge!
+                      .apply(letterSpacingDelta: 1.5),
+                ),
+              ),
+              SizedBox(height: TSizes.spaceBtwSections),
+              // Player scores
+              Obx(
+                () => Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    THomeButton(
-                      title: 'Solo',
-                      subtitle: 'Play solo with gemini',
-                      onPressed: () {
-                        controller.isSinglePlayer.value = true;
-                        THomeBottomSheet.show(
-                          controller: controller,
-                          title: 'Single Player',
-                          onPressed: controller.playSinglePlayer,
-                        );
-                      },
+                    Tooltip(
+                      // TODO : Tooptip theme
+                      message: 'Single Game High Score',
+                      child: THomePlayerScore(
+                        icon: Icons.person,
+                        score: playerController.playerInfo.value.singleGameScore
+                            .toString(),
+                      ),
                     ),
-                    SizedBox(width: TSizes.spaceBtwItems),
-                    THomeButton(
-                      isPrimary: false,
-                      title: 'With frens',
-                      subtitle: 'Play with friends',
-                      onPressed: () =>
-                          THomeMultiplayerBottomSheet.show(controller),
+                    THomePlayerScore(
+                      icon: Ionicons.people_sharp,
+                      score: playerController.playerInfo.value.multiGameScore
+                          .toString(),
                     ),
                   ],
                 ),
               ),
+              const Spacer(),
+              // Play buttons
+              THomePlayButtons(controller: controller),
+              const Spacer(),
+              const THomeFooter(),
             ],
           ),
         ),

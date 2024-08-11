@@ -22,7 +22,7 @@ class TSizes {
 
   // Button sizes
   static final double buttonHeight = 18.0.h;
-  static final double buttonRadius = 12.0.r;
+  static final double buttonRadius = 20.0.r;
   static final double buttonWidth = 120.0.w;
   static final double buttonElevation = 4.0.h;
 

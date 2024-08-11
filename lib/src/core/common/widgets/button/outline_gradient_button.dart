@@ -18,6 +18,7 @@ class TOutlineGradientButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlineGradientButton(
       onTap: onPressed,
+      inkWell: true,
       padding: EdgeInsets.symmetric(vertical: TSizes.buttonHeight),
       strokeWidth: strokeWidth!,
       radius: Radius.circular(TSizes.buttonRadius),
@@ -29,7 +30,11 @@ class TOutlineGradientButton extends StatelessWidget {
           Color(0xffBD99FE)
         ],
       ),
-      child: Center(child: Text(text)),
+      child: Center(
+          child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      )),
     );
   }
 }

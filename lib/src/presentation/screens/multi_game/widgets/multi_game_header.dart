@@ -32,10 +32,12 @@ class TMultiGameHeader extends StatelessWidget {
                 GameState.progress =>
                   TMultiGameProgress(controller: controller),
                 GameState.ended => TMultiGameEnded(
-                    // Local Game State Ends
-                    subtitle: controller.sortedPlayer.first.name,
+                    // Multi Game State Ends
+                    subtitle: controller.isDraw
+                        ? 'Draw'
+                        : controller.sortedPlayer.first.name,
                     title: 'Winner',
-                    shouldPlayPopper: true,
+                    shouldPlayPopper: controller.isDraw ? false : true,
                   ),
               }
             : TMultiGameEnded(

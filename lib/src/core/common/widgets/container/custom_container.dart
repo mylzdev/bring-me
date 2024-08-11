@@ -14,14 +14,18 @@ class TCustomContainer extends StatelessWidget {
     this.onPressed,
     this.borderColor,
     this.margin,
+    this.borderRadius,
+    this.boxShadow
   });
 
   final Widget child;
   final bool isPrimary;
   final double? height, width;
   final EdgeInsetsGeometry? padding, margin;
+  final BorderRadius? borderRadius;
   final VoidCallback? onPressed;
   final Color? borderColor;
+  final List<BoxShadow>? boxShadow;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +34,7 @@ class TCustomContainer extends StatelessWidget {
       height: height,
       margin: margin,
       decoration: BoxDecoration(
+        boxShadow: boxShadow,
         gradient: isPrimary
             ? const RadialGradient(
                 colors: [
@@ -51,14 +56,16 @@ class TCustomContainer extends StatelessWidget {
                   : TColors.secondary,
           width: 1,
         ),
-        borderRadius: BorderRadius.circular(
-          TSizes.borderRadiusLg,
-        ),
+        borderRadius: borderRadius ??
+            BorderRadius.circular(
+              TSizes.borderRadiusLg,
+            ),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(TSizes.borderRadiusLg),
+          borderRadius:
+              borderRadius ?? BorderRadius.circular(TSizes.borderRadiusLg),
           onTap: onPressed,
           child: Padding(
             padding: padding ?? EdgeInsets.all(TSizes.defaultSpace),
