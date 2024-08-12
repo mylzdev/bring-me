@@ -12,7 +12,9 @@ import 'package:get/get.dart';
 import '../../../core/common/widgets/appbar/custom_header.dart';
 
 class AvatarSelection extends StatelessWidget {
-  const AvatarSelection({super.key});
+  const AvatarSelection({super.key, this.isUpdating = false});
+
+  final bool isUpdating;
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +61,15 @@ class AvatarSelection extends StatelessWidget {
               child: TAnimatedCircleButton(
                 onTap: () {
                   TCircleButtonController.instance.isButtonTapped();
-                  Get.to(
-                    () => const AuthenticationScreen(),
-                    transition: Transition.rightToLeft,
-                    fullscreenDialog: true,
-                  );
+                  if (isUpdating) {
+                    controller.updatePlayerAvatar();
+                  } else {
+                    Get.to(
+                      () => const AuthenticationScreen(),
+                      transition: Transition.rightToLeft,
+                      fullscreenDialog: true,
+                    );
+                  }
                 },
               ),
             ),

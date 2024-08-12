@@ -1,12 +1,12 @@
+import 'package:bring_me/src/core/utils/exceptions/firebase_auth_exceptions.dart';
 import 'package:bring_me/src/data/repository/player_repository/player_model.dart';
 import 'package:bring_me/src/presentation/screens/auth/welcome.dart';
 import 'package:bring_me/src/presentation/screens/home/home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 
-import '../../../core/utils/device/local_storage_key.dart';
 import '../../../core/utils/exceptions/firebase_exceptions.dart';
 import '../../../core/utils/exceptions/format_exceptions.dart';
 import '../../../core/utils/exceptions/platform_exceptions.dart';
@@ -14,46 +14,46 @@ import '../../../core/utils/exceptions/platform_exceptions.dart';
 class PlayerRepository extends GetxService {
   static PlayerRepository get instance => Get.find();
 
-  final _localStorage = GetStorage();
-
-  late RxString? generatedUsername = ''.obs;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final RxString username = ''.obs;
+  final _auth = FirebaseAuth.instance;
+  User? get authUser => _auth.currentUser;
 
   @override
   void onReady() {
-    final user = _localStorage.read(TLocalStorageKey.username);
-    screenRedirect(user);
+    screenRedirect();
     super.onReady();
   }
 
-  @override
-  void onInit() {
-    final user = _localStorage.read(TLocalStorageKey.username);
-    if (user != null) {
-      username.value = user;
-    }
-    super.onInit();
-  }
-
-  screenRedirect(dynamic username) async {
-    if (username == null || username == '') {
+  screenRedirect() async {
+    final user = _auth.currentUser;
+    if (user == null) {
       Get.offAll(() => const WelcomeScreen());
     } else {
       Get.offAll(() => const HomeScreen());
     }
   }
 
-  Future<void> saveUsername(PlayerModel user) async {
+  Future<UserCredential> signinAnonymous() async {
     try {
-      final userRef = _db.collection('Users').doc(user.username);
-      final userSnapshot = await userRef.get();
+      return await _auth.signInAnonymously();
+    } on FirebaseAuthException catch (e) {
+      throw TFirebaseAuthException(e.code).message;
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Something went wrong while signing anonymously: $e';
+    }
+  }
 
-      if (userSnapshot.exists) {
-        throw 'username-taken';
-      }
-
-      await userRef.set(user.toMap());
+  Future<void> savePlayer(PlayerModel player) async {
+    try {
+      await _db.collection('Users').doc(player.id).set(player.toMap());
+    } on FirebaseAuthException catch (e) {
+      throw TFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
     } on FormatException catch (_) {
@@ -68,9 +68,53 @@ class PlayerRepository extends GetxService {
     }
   }
 
+  Future<void> updatePlayerName(String newUsername) async {
+    try {
+      final userRef = _db.collection('Users').doc(_auth.currentUser!.uid);
+      final playerSnapshot = await userRef.get();
+
+      PlayerModel updatedPlayerInfo = PlayerModel.fromSnapshot(playerSnapshot);
+      updatedPlayerInfo = updatedPlayerInfo.copyWith(username: newUsername);
+
+      await userRef.update(updatedPlayerInfo.toMap());
+    } on FirebaseAuthException catch (e) {
+      throw TFirebaseAuthException(e.code).message;
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Something went wrong. Please try again: $e';
+    }
+  }
+
+  Future<void> updatePlayerAvatar(int newAvatar) async {
+    try {
+      final userRef = _db.collection('Users').doc(_auth.currentUser!.uid);
+      final playerSnapshot = await userRef.get();
+
+      PlayerModel updatedPlayerInfo = PlayerModel.fromSnapshot(playerSnapshot);
+      updatedPlayerInfo = updatedPlayerInfo.copyWith(avatarIndex: newAvatar);
+
+      await userRef.update(updatedPlayerInfo.toMap());
+    } on FirebaseAuthException catch (e) {
+      throw TFirebaseAuthException(e.code).message;
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Something went wrong. Please try again: $e';
+    }
+  }
+
   Future<void> updateSingleGameScore(int singleGameScore) async {
     try {
-      final userRef = _db.collection('Users').doc(username.value);
+      final userRef = _db.collection('Users').doc(_auth.currentUser!.uid);
       final playerSnapshot = await userRef.get();
 
       PlayerModel player = PlayerModel.fromSnapshot(playerSnapshot);
@@ -80,6 +124,8 @@ class PlayerRepository extends GetxService {
       player = player.copyWith(singleGameScore: updatedSingleHighscore);
 
       await userRef.update(player.toMap());
+    } on FirebaseAuthException catch (e) {
+      throw TFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
     } on FormatException catch (_) {
@@ -93,7 +139,7 @@ class PlayerRepository extends GetxService {
 
   Future<void> updateMultiGameScore(int mulitGameScore) async {
     try {
-      final userRef = _db.collection('Users').doc(username.value);
+      final userRef = _db.collection('Users').doc(_auth.currentUser!.uid);
       final playerSnapshot = await userRef.get();
 
       PlayerModel player = PlayerModel.fromSnapshot(playerSnapshot);
@@ -103,6 +149,8 @@ class PlayerRepository extends GetxService {
       player = player.copyWith(multiGameScore: updatedSingleHighscore);
 
       await userRef.update(player.toMap());
+    } on FirebaseAuthException catch (e) {
+      throw TFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
     } on FormatException catch (_) {
@@ -110,13 +158,15 @@ class PlayerRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Error while updating to player single high score: $e';
+      throw 'Error while updating to player multi high score: $e';
     }
   }
 
-  Stream<DocumentSnapshot<Map<String, dynamic>>> playerStream(String username) {
+  Stream<DocumentSnapshot<Map<String, dynamic>>> playerStream() {
     try {
-      return _db.collection('Users').doc(username).snapshots();
+      return _db.collection('Users').doc(_auth.currentUser!.uid).snapshots();
+    } on FirebaseAuthException catch (e) {
+      throw TFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
     } on FormatException catch (_) {

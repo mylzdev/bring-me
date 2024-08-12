@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
 
 class PhotoPickerException implements Exception {
-  PhotoPickerException({this.message = 'Error with photo picker'});
+  const PhotoPickerException([this.message = 'Error with photo picker']);
 
   final String message;
 }
@@ -15,12 +15,14 @@ class PhotoPickerService {
     try {
       final photo = await _imagePicker.pickImage(source: ImageSource.camera);
 
-      if (photo == null) throw PhotoPickerException();
+      if (photo == null) throw const PhotoPickerException();
 
       final bytes = await photo.readAsBytes();
       return bytes;
-    } on Exception {
-      throw PhotoPickerException();
+    } on PhotoPickerException catch (e) {
+      throw PhotoPickerException(e.message).message;
+    } catch (_) {
+      rethrow;
     }
   }
 
@@ -28,12 +30,14 @@ class PhotoPickerService {
     try {
       final photo = await _imagePicker.pickImage(source: ImageSource.gallery);
 
-      if (photo == null) throw PhotoPickerException();
+      if (photo == null) throw const PhotoPickerException();
 
       final bytes = await photo.readAsBytes();
       return bytes;
-    } on Exception {
-      throw PhotoPickerException();
+    } on PhotoPickerException catch (e) {
+      throw PhotoPickerException(e.message).message;
+    } catch (_) {
+      rethrow;
     }
   }
 }

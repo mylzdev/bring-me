@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:bring_me/src/core/utils/popups/loader.dart';
-import 'package:bring_me/src/data/repository/player_repository/player_repository.dart';
 import 'package:bring_me/src/data/repository/room_repository/room_model.dart';
 import 'package:bring_me/src/data/repository/room_repository/room_player_model.dart';
 import 'package:bring_me/src/data/repository/room_repository/room_repository.dart';
+import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
 import 'package:bring_me/src/presentation/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,7 +22,7 @@ import '../room_controller/room_controller.dart';
 class HomeController extends GetxController {
   static HomeController get instance => Get.find();
 
-  final username = PlayerRepository.instance.username.value;
+  final _playerController = PlayerController.instance;
 
   final roomID = '12345'.obs;
   final maxPlayers = 2.0.obs;
@@ -55,7 +55,12 @@ class HomeController extends GetxController {
           maxPlayers: maxPlayers.value.floor(),
           huntLocation: huntLocation.value,
           gameState: GameState.initial,
-          players: [RoomPlayerModel(name: username)],
+          players: [
+            RoomPlayerModel(
+              name: _playerController.playername,
+              avatarIndex: _playerController.playerInfo.value.avatarIndex,
+            ),
+          ],
           items: []);
       await RoomRepository.instance.createRoom(room);
 
@@ -75,8 +80,10 @@ class HomeController extends GetxController {
       if (!joinRoomState.currentState!.validate()) return;
 
       TFullScreenLoader.openLoadingDialog('Joining room');
-      final updatedRoom = await RoomRepository.instance
-          .joinRoom(joinRoomTextController.text, username);
+      final updatedRoom = await RoomRepository.instance.joinRoom(
+        joinRoomTextController.text,
+        _playerController.playerInfo.value,
+      );
       roomInfo.value = updatedRoom;
 
       Get.offAll(() => const RoomScreen());

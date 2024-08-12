@@ -1,4 +1,5 @@
 import 'package:bring_me/src/data/repository/player_repository/player_avatar_model.dart';
+import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -17,11 +18,12 @@ class TRoomPlayers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final playerController = PlayerController.instance;
     return Obx(
       () => Visibility(
         visible: controller.roomInfo.value.players.length != 1,
         replacement: TAvatar(
-          avatar: PlayerAvatarModel.one,
+          avatar: playerController.playerAvatar,
           height: 120.h,
           width: 120.w,
           name: controller.roomInfo.value.players.first.name,
@@ -35,7 +37,8 @@ class TRoomPlayers extends StatelessWidget {
           ),
           itemCount: controller.roomInfo.value.players.length,
           itemBuilder: (context, index) => TAvatar(
-            avatar: PlayerAvatarModel.one,
+            avatar: PlayerAvatarModel
+                .avatars[controller.roomInfo.value.players[index].avatarIndex!],
             name: controller.roomInfo.value.players[index].name,
             icon: controller.roomInfo.value.players[index].isLeader
                 ? Ionicons.star

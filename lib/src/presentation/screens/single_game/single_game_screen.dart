@@ -26,7 +26,7 @@ class GameScreen extends GetView<SingleGameController> {
           title: Obx(
             () => Text(
               THelperFunctions.getHuntLocation(controller.huntLocation.value),
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),
           actions: [
@@ -53,7 +53,10 @@ class GameScreen extends GetView<SingleGameController> {
               children: [
                 Visibility(
                   visible: controller.gameState.value == GameState.progress,
-                  child: Text('Items left: ${controller.itemLeft.value}'),
+                  child: Text(
+                    'Items left: ${controller.itemLeft.value}',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ),
                 const Spacer(),
                 switch (controller.gameState.value) {

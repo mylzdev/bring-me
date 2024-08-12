@@ -1,17 +1,16 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:bring_me/src/core/config/colors.dart';
+import 'package:bring_me/src/core/common/widgets/dialog/custom_dialog.dart';
 import 'package:bring_me/src/core/config/enums.dart';
-import 'package:bring_me/src/core/config/sizes.dart';
 import 'package:bring_me/src/core/config/text_strings.dart';
 import 'package:bring_me/src/core/utils/logging/logger.dart';
 import 'package:bring_me/src/core/utils/popups/loader.dart';
 import 'package:bring_me/src/core/utils/popups/popups.dart';
-import 'package:bring_me/src/data/repository/player_repository/player_repository.dart';
 import 'package:bring_me/src/data/repository/room_repository/room_model.dart';
 import 'package:bring_me/src/data/repository/room_repository/room_repository.dart';
 import 'package:bring_me/src/presentation/controllers/home_controller/home_controller.dart';
+import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
 import 'package:bring_me/src/presentation/screens/home/home.dart';
 import 'package:bring_me/src/presentation/screens/multi_game/multi_game.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,7 +36,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
 
   // Repositories
   final _roomRepository = RoomRepository.instance;
-  final _playerName = PlayerRepository.instance.username.value;
+  String get playerName => PlayerController.instance.playername;
 
   // Items
   final _items = RxList<String>();
@@ -74,7 +73,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   final isReady = false.obs;
   bool get isRoomLeader {
     final currentPlayer = roomInfo.value.players.firstWhere(
-      (player) => player.name == _playerName,
+      (player) => player.name == playerName,
     );
     return currentPlayer.isLeader;
   }
@@ -217,7 +216,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
     try {
       await _roomRepository.updatePlayerScoreAndItemLeft(
         roomID,
-        _playerName,
+        playerName,
         score.value,
         itemLeft.value,
       );
@@ -249,9 +248,8 @@ class RoomController extends GetxController with WidgetsBindingObserver {
       if (isRoomLeader) {
         await _roomRepository.deleteRoom(roomID);
       } else {
-        // TODO : Loader & saving data
         Get.offAll(() => const HomeScreen());
-        await _roomRepository.removePlayerFromRoom(roomID, _playerName);
+        await _roomRepository.removePlayerFromRoom(roomID, playerName);
       }
     } catch (e) {
       _handleError(e, 'Quit Room');
@@ -263,7 +261,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
     try {
       await _roomRepository.updatePlayerReadyState(
         roomID,
-        _playerName,
+        playerName,
         isReady.value = !isReady.value,
       );
     } catch (e) {
@@ -314,32 +312,11 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   }
 
   void onLeaveRoom() {
-    Get.defaultDialog(
+    CustomDialog.showOnLeaveDialog(
       title:
           isRoomLeader ? 'The room will be dismissed' : 'Confirm leaving room',
-      middleText: 'Are you sure you want to leave the room?',
-      contentPadding: EdgeInsets.all(TSizes.defaultSpace),
-      titlePadding: EdgeInsets.only(top: TSizes.defaultSpace),
-      confirm: ElevatedButton(
-        onPressed: () => quitRoom(),
-        style: ElevatedButton.styleFrom(
-            backgroundColor: TColors.error,
-            padding: EdgeInsets.zero,
-            side: BorderSide.none),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: TSizes.lg),
-          child: const Text('Leave'),
-        ),
-      ),
-      // Cancel button
-      cancel: OutlinedButton(
-        style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
-        onPressed: () => Navigator.of(Get.overlayContext!).pop(),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: TSizes.lg),
-          child: const Text('Cancel'),
-        ),
-      ),
+      subtitle: 'Are you sure you want to leave the room?',
+      onLeavePressed: () => quitRoom(),
     );
   }
 
@@ -404,7 +381,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
       } else {
         itemLeft.value--;
         isFinish.value = true;
-        // Local End game
+        PlayerController.instance.updateMultiHighScore(score.value);
       }
     } catch (e) {
       rethrow;

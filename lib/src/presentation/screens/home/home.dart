@@ -20,59 +20,63 @@ class HomeScreen extends GetView<HomeController> {
     HomeBinding().dependencies();
     final playerController = PlayerController.instance;
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.all(TSizes.spaceBtwSections),
-        child: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(height: TSizes.spaceBtwSections),
-              // Avatar
-              Obx(
-                () => TAvatar(
-                  avatar: playerController.playerAvatar,
-                  height: 120.h,
-                  width: 120.w,
-                  name: controller.username,
-                  shouldGlow: true,
-                  isSelected: true,
-                  textStyle: Theme.of(context)
-                      .textTheme
-                      .titleLarge!
-                      .apply(letterSpacingDelta: 1.5),
+      body: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: Get.height),
+          child: Padding(
+            padding: EdgeInsets.all(TSizes.spaceBtwSections),
+            child: Column(
+              children: [
+                SizedBox(height: TSizes.spaceBtwSections),
+                // Avatar
+                Obx(
+                  () => TAvatar(
+                    avatar: playerController.playerAvatar,
+                    height: 120.h,
+                    width: 120.w,
+                    name: playerController.playername,
+                    shouldGlow: true,
+                    isSelected: true,
+                    textStyle: Theme.of(context)
+                        .textTheme
+                        .titleLarge!
+                        .apply(letterSpacingDelta: 1.5),
+                  ),
                 ),
-              ),
-              SizedBox(height: TSizes.spaceBtwSections),
-              // Player scores
-              Obx(
-                () => Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Tooltip(
-                      // TODO : Tooptip theme
-                      message: 'Single Game High Score',
-                      child: THomePlayerScore(
-                        icon: Icons.person,
-                        score: playerController.playerInfo.value.singleGameScore
-                            .toString(),
+                SizedBox(height: TSizes.spaceBtwSections),
+                // Player scores
+                Obx(
+                  () => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Tooltip(
+                        message: 'Single-Player HighScore',
+                        child: THomePlayerScore(
+                          icon: Icons.person,
+                          score: playerController
+                              .playerInfo.value.singleGameScore
+                              .toString(),
+                        ),
                       ),
-                    ),
-                    THomePlayerScore(
-                      icon: Ionicons.people_sharp,
-                      score: playerController.playerInfo.value.multiGameScore
-                          .toString(),
-                    ),
-                  ],
+                      Tooltip(
+                        message: 'Multi-Player HighScore',
+                        child: THomePlayerScore(
+                          icon: Ionicons.people_sharp,
+                          score: playerController
+                              .playerInfo.value.multiGameScore
+                              .toString(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const Spacer(),
-              // Play buttons
-              THomePlayButtons(controller: controller),
-              const Spacer(),
-              const THomeFooter(),
-            ],
+                const Spacer(),
+                // Play buttons
+                THomePlayButtons(controller: controller),
+                const Spacer(),
+                THomeFooter(controller: controller),
+              ],
+            ),
           ),
         ),
       ),

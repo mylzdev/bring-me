@@ -3,17 +3,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class RoomPlayerModel {
   static const int maxItems = 5;
 
-  String name;
+  final String name;
   bool isLeader;
   bool isReady;
   int score;
   int itemLeft;
+  int? avatarIndex;
   RoomPlayerModel({
     required this.name,
     this.isLeader = true,
     this.isReady = true,
     this.score = 0,
     this.itemLeft = maxItems,
+    this.avatarIndex = 0,
   });
 
   RoomPlayerModel copyWith({
@@ -23,6 +25,7 @@ class RoomPlayerModel {
     bool? isReady,
     int? score,
     int? itemLeft,
+    int? avatarIndex,
   }) {
     return RoomPlayerModel(
       name: name ?? this.name,
@@ -30,6 +33,7 @@ class RoomPlayerModel {
       isReady: isReady ?? this.isReady,
       score: score ?? this.score,
       itemLeft: itemLeft ?? this.itemLeft,
+      avatarIndex: avatarIndex ?? this.avatarIndex,
     );
   }
 
@@ -42,6 +46,7 @@ class RoomPlayerModel {
       'isReady': isReady,
       'score': score,
       'itemLeft': itemLeft,
+      'avatarIndex': avatarIndex,
     };
   }
 
@@ -52,6 +57,7 @@ class RoomPlayerModel {
       isReady: map['isReady'] as bool,
       score: map['score'] as int,
       itemLeft: map['itemLeft'] as int,
+      avatarIndex: map['avatarIndex'] as int,
     );
   }
 
@@ -65,6 +71,7 @@ class RoomPlayerModel {
         isReady: data['isReady'] as bool,
         score: data['score'] as int,
         itemLeft: data['itemLeft'] as int,
+        avatarIndex: data['avatarIndex'] as int,
       );
     } else {
       return RoomPlayerModel.empty();
@@ -73,5 +80,5 @@ class RoomPlayerModel {
 
   @override
   String toString() =>
-      'User(name: $name, isLeader: $isLeader, isReady: $isReady, Score: $score)';
+      'User(name: $name, isLeader: $isLeader, isReady: $isReady, Score: $score), AvatarIndex: $avatarIndex';
 }

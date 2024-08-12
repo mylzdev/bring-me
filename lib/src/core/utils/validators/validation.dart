@@ -11,6 +11,20 @@ class TValidator {
     return null;
   }
 
+  static String? validateUpdateUsername(String? fieldName, String? value, String oldName) {
+    if (value == null || value.isEmpty) {
+      return '$fieldName is required';
+    } else if (value.length >= 10) {
+      return 'Username should not exceed at 10 characters';
+    } else if (value.length < 3) {
+      return 'Username should be at least 3 characters';
+    } else if (value == oldName) {
+      return 'Enter a new username';
+    }
+
+    return null;
+  }
+
   static String? validateRoomCode(String? fieldname, String? value) {
     if (value == null || value.isEmpty) {
       return '$fieldname is required';

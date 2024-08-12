@@ -20,21 +20,21 @@ class TWelcomeBody extends StatelessWidget {
             'Play The',
             style: Theme.of(context)
                 .textTheme
-                .displaySmall!
+                .displayMedium!
                 .apply(heightFactor: 1),
           ),
           TGradientText(
             'Classic',
             style: Theme.of(context)
                 .textTheme
-                .displaySmall!
+                .displayMedium!
                 .apply(heightFactor: 1),
           ),
           Text(
             'Game Online',
             style: Theme.of(context)
                 .textTheme
-                .displaySmall!
+                .displayMedium!
                 .apply(heightFactor: 1),
           ),
           SizedBox(height: TSizes.spaceBtwSections),

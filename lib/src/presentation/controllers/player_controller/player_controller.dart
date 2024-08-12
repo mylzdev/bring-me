@@ -31,16 +31,18 @@ class PlayerController extends GetxController {
 
   // Avatar Selection
   final avatarIndex = 0.obs;
+  final isAvatarHeaderSelected = true.obs;
   String get playerAvatar =>
       PlayerAvatarModel.avatars[playerInfo.value.avatarIndex];
 
   // Username
   final usernameController = TextEditingController();
   GlobalKey<FormState> usernameFormKey = GlobalKey<FormState>();
+  String get playername => playerInfo.value.username;
 
   @override
   Future<void> onInit() async {
-    streamPlayerInfo(_playerRepository.username.value);
+    streamPlayerInfo();
     super.onInit();
   }
 
@@ -50,23 +52,25 @@ class PlayerController extends GetxController {
     super.onClose();
   }
 
-  Future<void> createUsername() async {
+  Future<void> createPlayer() async {
     try {
       if (!usernameFormKey.currentState!.validate()) return;
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => TFullScreenLoader.openLoadingDialog('Loading'),
       );
 
+      final userCredential = await _playerRepository.signinAnonymous();
+
       final playerModel = PlayerModel(
+        id: userCredential.user!.uid,
         username: usernameController.text,
         avatarIndex: avatarIndex.value,
       );
 
       playerInfo.value = playerModel;
-      await _playerRepository.saveUsername(playerModel);
+      await _playerRepository.savePlayer(playerModel);
 
-      _localStorage.write(TLocalStorageKey.username, usernameController.text);
-      _playerRepository.username.value = usernameController.text;
+      _localStorage.write(TLocalStorageKey.avatarIndex, avatarIndex.value);
       Get.offAll(() => const HomeScreen());
     } catch (e) {
       TLoggerHelper.error(e.toString());
@@ -77,13 +81,46 @@ class PlayerController extends GetxController {
     }
   }
 
-  void streamPlayerInfo(String username) {
+  Future<void> updatePlayerName() async {
     try {
-      if (username.isNotEmpty || username != '') {
-        _playerSubscription =
-            _playerRepository.playerStream(username).listen((playerSnapshot) {
+      if (!usernameFormKey.currentState!.validate()) return;
+
+      TFullScreenLoader.openLoadingDialog('Updating');
+
+      await _playerRepository.updatePlayerName(usernameController.text);
+      TFullScreenLoader.stopLoading();
+      Get.back();
+    } catch (e) {
+      TLoggerHelper.error(e.toString());
+      TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
+      TFullScreenLoader.stopLoading();
+    }
+  }
+
+  Future<void> updatePlayerAvatar() async {
+    try {
+      TFullScreenLoader.openLoadingDialog('Updating');
+
+      await _playerRepository.updatePlayerAvatar(avatarIndex.value);
+      TFullScreenLoader.stopLoading();
+      Get.back();
+    } catch (e) {
+      TLoggerHelper.error(e.toString());
+      TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
+      TFullScreenLoader.stopLoading();
+    }
+  }
+
+  void streamPlayerInfo() {
+    try {
+      if (_playerRepository.authUser?.uid != null) {
+        _playerSubscription = _playerRepository
+            .playerStream()
+            .listen((playerSnapshot) {
           if (playerSnapshot.exists) {
             playerInfo.value = PlayerModel.fromSnapshot(playerSnapshot);
+            avatarIndex.value = playerInfo.value.avatarIndex;
+            usernameController.text = playerInfo.value.username;
             TLoggerHelper.info(playerInfo.value.toString());
           } else {
             throw 'Username does not exist';
@@ -100,6 +137,15 @@ class PlayerController extends GetxController {
   Future<void> updateSingleHighScore(int newSingleScore) async {
     try {
       await _playerRepository.updateSingleGameScore(newSingleScore);
+    } catch (e) {
+      TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
+      TLoggerHelper.error(e.toString());
+    }
+  }
+
+  Future<void> updateMultiHighScore(int newMultiScore) async {
+    try {
+      await _playerRepository.updateMultiGameScore(newMultiScore);
     } catch (e) {
       TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
       TLoggerHelper.error(e.toString());

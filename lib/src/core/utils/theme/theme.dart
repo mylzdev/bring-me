@@ -1,3 +1,4 @@
+import 'package:bring_me/src/core/utils/theme/widget_themes/tooltip_theme.dart';
 import 'package:flutter/material.dart';
 
 import '../../config/colors.dart';
@@ -28,5 +29,6 @@ class TAppTheme {
     elevatedButtonTheme: TElevatedButtonTheme.darkElevatedButtonTheme,
     outlinedButtonTheme: TOutlinedButtonTheme.darkOutlinedButtonTheme,
     inputDecorationTheme: TTextFormFieldTheme.darkInputDecorationTheme,
+    tooltipTheme: TTooltipTheme.darkTooltipTheme,
   );
 }

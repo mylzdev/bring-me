@@ -68,7 +68,8 @@ class THomePlayButtons extends StatelessWidget {
             onPressed: () => THomeBottomSheet.show(
               controller: controller,
               title: 'Join Room',
-              contentVisible: false,
+              joinTextFieldVisible: false,
+              qrVisible: true,
               onPressed: () => controller.joinRoom(),
             ),
           ),

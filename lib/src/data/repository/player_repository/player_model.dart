@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PlayerModel {
+  final String? id;
   final String username;
   final int avatarIndex;
   final int multiGameScore;
   final int singleGameScore;
   PlayerModel({
+    this.id,
     required this.username,
     required this.avatarIndex,
     this.multiGameScore = 0,
@@ -53,6 +55,7 @@ class PlayerModel {
     if (document.exists) {
       final data = document.data()!;
       return PlayerModel(
+        id: document.id,
         username: data['username'] as String,
         avatarIndex: data['avatarIndex'] as int,
         multiGameScore: data['multiGameScore'] as int,
@@ -70,6 +73,6 @@ class PlayerModel {
 
   @override
   String toString() {
-    return 'PlayerModel(username: $username, avatarIndex: $avatarIndex, multiGameScore: $multiGameScore, singleGameScore: $singleGameScore)';
+    return 'PlayerModel(id: $id, username: $username, avatarIndex: $avatarIndex, multiGameScore: $multiGameScore, singleGameScore: $singleGameScore)';
   }
 }

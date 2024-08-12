@@ -1,4 +1,5 @@
 import 'package:bring_me/src/core/common/widgets/button/elevated_gradient_button.dart';
+import 'package:bring_me/src/core/utils/popups/popups.dart';
 import 'package:bring_me/src/core/utils/validators/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,26 +11,29 @@ import '../../../../core/config/enums.dart';
 import '../../../../core/config/sizes.dart';
 import '../../../controllers/home_controller/home_controller.dart';
 import 'home_location_button.dart';
+import 'home_qr_card.dart';
 
 class THomeBottomSheet {
   static void show({
     required HomeController controller,
     required String title,
     required VoidCallback onPressed,
-    bool contentVisible = true,
+    bool joinTextFieldVisible = true,
+    bool qrVisible = false,
     bool maxPlayerVisible = false,
   }) {
     Get.bottomSheet(
       backgroundColor: TColors.dark,
       enableDrag: false,
+      isScrollControlled: true,
       Container(
         padding: EdgeInsets.all(TSizes.defaultSpace),
         height: Get.height * 0.5,
         width: double.maxFinite,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(TSizes.borderRadiusLg * 2),
-            topRight: Radius.circular(TSizes.borderRadiusLg * 2),
+            topLeft: Radius.circular(TSizes.borderRadiusLg * 3),
+            topRight: Radius.circular(TSizes.borderRadiusLg * 3),
           ),
           border: const Border(
             top: BorderSide(color: TColors.primary),
@@ -46,7 +50,7 @@ class THomeBottomSheet {
             SizedBox(height: TSizes.spaceBtwItems),
             // Room code for Join room
             Visibility(
-              visible: !contentVisible,
+              visible: !joinTextFieldVisible,
               child: Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,6 +86,7 @@ class THomeBottomSheet {
                         ],
                       ),
                     ),
+                    // QR
                     SizedBox(height: TSizes.spaceBtwItems),
                     Text(
                       'Join via QR',
@@ -92,30 +97,25 @@ class THomeBottomSheet {
                       child: Row(
                         children: [
                           Expanded(
-                            child: GestureDetector(
-                              onTap: () {},
-                              child: Container(
-                                height: double.maxFinite,
-                                color: TColors.darkContainer,
-                                child: const Icon(Iconsax.gallery),
-                              ),
+                            child: THomeQrCard(
+                              icon: Iconsax.gallery,
+                              onPressed: () => TPopup.warningSnackbar(
+                                  title: 'Coming Soon',
+                                  message: 'This feature will be up soon'),
                             ),
                           ),
                           SizedBox(width: TSizes.sm),
                           Expanded(
-                            child: GestureDetector(
-                              onTap: () {},
-                              child: Container(
-                                height: double.maxFinite,
-                                color: TColors.darkContainer,
-                                child:
-                                    const Icon(Icons.qr_code_scanner_rounded),
-                              ),
+                            child: THomeQrCard(
+                              icon: Icons.qr_code_scanner_rounded,
+                              onPressed: () => TPopup.warningSnackbar(
+                                  title: 'Coming Soon',
+                                  message: 'This feature will be up soon'),
                             ),
                           ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -147,7 +147,7 @@ class THomeBottomSheet {
             ),
             // Location cards
             Visibility(
-              visible: contentVisible,
+              visible: joinTextFieldVisible,
               child: Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -167,7 +167,7 @@ class THomeBottomSheet {
             ),
             // Button footer
             Visibility(
-              visible: contentVisible,
+              visible: joinTextFieldVisible,
               child: Column(
                 children: [
                   SizedBox(height: TSizes.spaceBtwItems),

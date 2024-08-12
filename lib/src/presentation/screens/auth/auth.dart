@@ -4,13 +4,16 @@ import 'package:bring_me/src/core/config/colors.dart';
 import 'package:bring_me/src/core/config/sizes.dart';
 import 'package:bring_me/src/data/repository/player_repository/player_avatar_model.dart';
 import 'package:flutter/material.dart';
+import 'package:ionicons/ionicons.dart';
 
 import '../../../core/common/widgets/appbar/custom_header.dart';
 import '../../../core/utils/validators/validation.dart';
 import '../../controllers/player_controller/player_controller.dart';
 
 class AuthenticationScreen extends StatelessWidget {
-  const AuthenticationScreen({super.key});
+  const AuthenticationScreen({super.key, this.isUpdating = false});
+
+  final bool isUpdating;
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +23,8 @@ class AuthenticationScreen extends StatelessWidget {
         backgroundColor: TColors.darkContainer,
         body: Column(
           children: [
-            const TCustomHeader(
-              title: 'Your Name',
+            TCustomHeader(
+              title: isUpdating ? 'Change Name' : 'Your Name',
               subTitle: 'Make it unique',
             ),
             TAvatar(
@@ -42,8 +45,13 @@ class AuthenticationScreen extends StatelessWidget {
                       .titleLarge!
                       .apply(letterSpacingDelta: 2),
                   controller: controller.usernameController,
-                  validator: (value) =>
-                      TValidator.validateNickname('Username', value),
+                  validator: (value) => !isUpdating
+                      ? TValidator.validateNickname('Username', value)
+                      : TValidator.validateUpdateUsername(
+                          'Username',
+                          value,
+                          controller.playername,
+                        ),
                   decoration: const InputDecoration(
                     hintText: 'Type here',
                     enabledBorder: UnderlineInputBorder(
@@ -70,9 +78,14 @@ class AuthenticationScreen extends StatelessWidget {
             ),
             const Spacer(),
             TAnimatedCircleButton(
+              icon: isUpdating ? Ionicons.sync : null,
               onTap: () {
                 TCircleButtonController.instance.isButtonTapped();
-                PlayerController.instance.createUsername();
+                if (isUpdating) {
+                  controller.updatePlayerName();
+                } else {
+                  PlayerController.instance.createPlayer();
+                }
               },
             ),
           ],

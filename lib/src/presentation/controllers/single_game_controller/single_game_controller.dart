@@ -7,13 +7,10 @@ import 'package:bring_me/src/core/utils/device/local_storage_key.dart';
 import 'package:bring_me/src/core/utils/popups/popups.dart';
 import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
 import 'package:bring_me/src/presentation/screens/home/home.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-import '../../../core/config/colors.dart';
 import '../../../core/config/enums.dart';
-import '../../../core/config/sizes.dart';
 import '../../../core/utils/logging/logger.dart';
 import '../../../data/repository/gemini_repository/gemini_repository.dart';
 import '../../../data/repository/room_repository/room_player_model.dart';
@@ -25,7 +22,6 @@ class SingleGameController extends GetxController {
   SingleGameController(this.homeController);
   final HomeController homeController;
 
-  final _playerController = PlayerController.instance;
   final _localStorage = GetStorage();
 
   final _photoPickerService = PhotoPickerService();
@@ -84,7 +80,6 @@ class SingleGameController extends GetxController {
         itemLeft.value--;
         _resetTimer();
       } else {
-        itemLeft.value--;
         gameEnds();
       }
     } catch (e) {
@@ -109,7 +104,7 @@ class SingleGameController extends GetxController {
       onRetry: retry,
       onContinue: () => Get.offAll(() => const HomeScreen()),
     );
-    await _playerController.updateSingleHighScore(score.value);
+    await PlayerController.instance.updateSingleHighScore(score.value);
   }
 
   String getLottieBaseScore(int score) {
@@ -134,19 +129,24 @@ class SingleGameController extends GetxController {
         // Photo valid
         incrementScore();
         itemHuntStatus.value = ItemHuntStatus.validationSuccess;
+        await resetItemStatus();
         skipItem();
         _resetTimer();
       } else {
         // Photo not valid
         itemHuntStatus.value = ItemHuntStatus.validationFailure;
+        resetItemStatus();
       }
     } catch (e) {
       TLoggerHelper.error(e.toString());
       itemHuntStatus.value = ItemHuntStatus.validationFailure;
-    } finally {
-      await Future.delayed(const Duration(seconds: 1));
-      itemHuntStatus.value = ItemHuntStatus.initial;
+      resetItemStatus();
     }
+  }
+
+  Future<void> resetItemStatus() async {
+    await Future.delayed(const Duration(seconds: 1));
+    itemHuntStatus.value = ItemHuntStatus.initial;
   }
 
   void incrementScore() {
@@ -182,32 +182,11 @@ class SingleGameController extends GetxController {
     }
   }
 
-  void onLeaveGame() async {
-    await Get.defaultDialog(
-      title: 'The data will be lost',
-      middleText: 'Are you sure you want to leave the room?',
-      contentPadding: EdgeInsets.all(TSizes.defaultSpace),
-      titlePadding: EdgeInsets.only(top: TSizes.defaultSpace),
-      confirm: ElevatedButton(
-        onPressed: () => Get.offAll(() => const HomeScreen()),
-        style: ElevatedButton.styleFrom(
-            backgroundColor: TColors.error,
-            padding: EdgeInsets.zero,
-            side: BorderSide.none),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: TSizes.lg),
-          child: const Text('Leave'),
-        ),
-      ),
-      // Cancel button
-      cancel: OutlinedButton(
-        style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
-        onPressed: () => Navigator.of(Get.overlayContext!).pop(),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: TSizes.lg),
-          child: const Text('Cancel'),
-        ),
-      ),
+  void onLeaveGame() {
+    CustomDialog.showOnLeaveDialog(
+      title: 'The data might be lost',
+      subtitle: 'Are you sure you want to leave the room?',
+      onLeavePressed: () => Get.offAll(() => const HomeScreen()),
     );
   }
 }

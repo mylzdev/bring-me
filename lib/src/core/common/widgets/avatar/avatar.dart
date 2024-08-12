@@ -18,6 +18,7 @@ class TAvatar extends StatelessWidget {
     this.margin,
     this.isSelected = true,
     this.borderColor,
+    this.backgroundColor,
   });
 
   final String avatar;
@@ -28,7 +29,7 @@ class TAvatar extends StatelessWidget {
   final double? height, width;
   final EdgeInsetsGeometry? margin;
   final bool isSelected;
-  final Color? borderColor;
+  final Color? borderColor, backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,7 @@ class TAvatar extends StatelessWidget {
       width: width,
       margin: margin ?? EdgeInsets.all(TSizes.lg),
       decoration: BoxDecoration(
-        color: TColors.darkGrey.withOpacity(0.1),
+        color: backgroundColor ?? TColors.darkGrey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(100.r),
         border: Border.all(
           color: isSelected ? TColors.primary : Colors.transparent,

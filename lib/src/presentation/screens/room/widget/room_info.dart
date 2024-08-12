@@ -1,4 +1,7 @@
+import 'package:bring_me/src/presentation/screens/room/widget/room_qr.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:ionicons/ionicons.dart';
 
 import '../../../../core/common/widgets/container/custom_container.dart';
@@ -31,7 +34,7 @@ class TRoomInfo extends StatelessWidget {
           ),
           Text(
             controller.roomID,
-            style: Theme.of(context).textTheme.displayMedium,
+            style: GoogleFonts.blackHanSans().copyWith(fontSize: 35.sp),
           ),
           SizedBox(height: TSizes.spaceBtwItems),
           Row(
@@ -46,9 +49,12 @@ class TRoomInfo extends StatelessWidget {
                 icon: Ionicons.people,
                 title: '${controller.roomInfo.value.maxPlayers} players',
               ),
-              const TIconText(
-                icon: Icons.qr_code,
-                title: 'QR code',
+              GestureDetector(
+                onTap: () => RoomQR.show(controller),
+                child: const TIconText(
+                  icon: Icons.qr_code,
+                  title: 'QR code',
+                ),
               ),
             ],
           ),

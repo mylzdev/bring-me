@@ -1,4 +1,5 @@
 import 'package:bring_me/src/core/config/enums.dart';
+import 'package:bring_me/src/data/repository/player_repository/player_model.dart';
 import 'package:bring_me/src/data/repository/room_repository/room_model.dart';
 import 'package:bring_me/src/data/repository/room_repository/room_player_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,7 +28,7 @@ class RoomRepository extends GetxService {
     }
   }
 
-  Future<RoomModel> joinRoom(String roomID, String playerUsername) async {
+  Future<RoomModel> joinRoom(String roomID, PlayerModel player) async {
     try {
       final roomRef = _db.collection('Rooms').doc(roomID);
       final roomSnapshot = await roomRef.get();
@@ -44,7 +45,8 @@ class RoomRepository extends GetxService {
 
       room.players.add(
         RoomPlayerModel(
-          name: playerUsername,
+          name: player.username,
+          avatarIndex: player.avatarIndex,
           isLeader: false,
           isReady: false,
         ),

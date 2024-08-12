@@ -1,9 +1,9 @@
+import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/config/colors.dart';
-import '../../../../data/repository/player_repository/player_repository.dart';
 import '../../../../data/repository/room_repository/room_player_model.dart';
 
 class TPlacingBadge extends StatelessWidget {
@@ -23,10 +23,10 @@ class TPlacingBadge extends StatelessWidget {
       child: ClipPath(
         clipper: StarClipper(7),
         child: Container(
-          color: sortedPlayers[index].name ==
-                  PlayerRepository.instance.username.value
-              ? TColors.secondary
-              : TColors.primary,
+          color:
+              sortedPlayers[index].name == PlayerController.instance.playername
+                  ? TColors.secondary
+                  : TColors.primary,
           height: 45.h,
           width: 45.w,
           child: Center(

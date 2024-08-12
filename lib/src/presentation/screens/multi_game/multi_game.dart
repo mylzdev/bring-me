@@ -5,7 +5,6 @@ import 'package:bring_me/src/core/config/enums.dart';
 import 'package:bring_me/src/core/config/lottie.dart';
 import 'package:bring_me/src/core/config/sizes.dart';
 import 'package:bring_me/src/core/utils/helpers/helper_functions.dart';
-import 'package:bring_me/src/data/repository/player_repository/player_repository.dart';
 import 'package:bring_me/src/presentation/controllers/room_controller/room_controller.dart';
 import 'package:custom_rating_bar/custom_rating_bar.dart';
 import 'package:flutter/material.dart';
@@ -96,11 +95,11 @@ class MultiGameScreen extends GetView<RoomController> {
                           child: Stack(
                             children: [
                               TCustomContainer(
-                                borderColor: controller
-                                            .sortedPlayer[index].name ==
-                                        PlayerRepository.instance.username.value
-                                    ? TColors.secondary
-                                    : TColors.primary,
+                                borderColor:
+                                    controller.sortedPlayer[index].name ==
+                                            controller.playerName
+                                        ? TColors.secondary
+                                        : TColors.primary,
                                 margin:
                                     EdgeInsets.symmetric(vertical: TSizes.sm),
                                 child: Row(
