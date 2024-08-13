@@ -1,3 +1,5 @@
+import 'package:bring_me/src/presentation/controllers/qr_scanner_controller/qr_scanner_binding.dart';
+import 'package:bring_me/src/presentation/controllers/qr_scanner_controller/qr_scanner_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,16 +10,17 @@ import '../../../../core/config/sizes.dart';
 import '../../../controllers/home_controller/home_controller.dart';
 import 'home_bottom_sheet.dart';
 
-class THomePlayButtons extends StatelessWidget {
+class THomePlayButtons extends GetView<QrScannerController> {
   const THomePlayButtons({
     super.key,
-    required this.controller,
+    required this.homeController,
   });
 
-  final HomeController controller;
+  final HomeController homeController;
 
   @override
   Widget build(BuildContext context) {
+    QrScannerBinding().dependencies();
     return Column(
       children: [
         SizedBox(
@@ -26,9 +29,9 @@ class THomePlayButtons extends StatelessWidget {
             text: 'SINGLE GAME',
             onPressed: () {
               THomeBottomSheet.show(
-                controller: controller,
+                controller: homeController,
                 title: 'Single Player',
-                onPressed: controller.playSinglePlayer,
+                onPressed: homeController.playSinglePlayer,
               );
             },
           ),
@@ -53,10 +56,10 @@ class THomePlayButtons extends StatelessWidget {
           child: TGradientElevatedButton(
             text: 'CREATE ROOM',
             onPressed: () => THomeBottomSheet.show(
-              controller: controller,
+              controller: homeController,
               title: 'Create Room',
               maxPlayerVisible: true,
-              onPressed: controller.createRoom,
+              onPressed: homeController.createRoom,
             ),
           ),
         ),
@@ -65,13 +68,15 @@ class THomePlayButtons extends StatelessWidget {
           width: double.maxFinite,
           child: TGradientElevatedButton(
             text: 'JOIN ROOM',
-            onPressed: () => THomeBottomSheet.show(
-              controller: controller,
-              title: 'Join Room',
-              joinTextFieldVisible: false,
-              qrVisible: true,
-              onPressed: () => controller.joinRoom(),
-            ),
+            onPressed: () {
+              THomeBottomSheet.show(
+                controller: homeController,
+                title: 'Join Room',
+                joinTextFieldVisible: false,
+                qrVisible: true,
+                onPressed: () => homeController.joinRoomViaCode(),
+              );
+            },
           ),
         ),
       ],

@@ -6,6 +6,7 @@ import 'package:bring_me/src/data/repository/player_repository/player_avatar_mod
 import 'package:bring_me/src/data/repository/player_repository/player_model.dart';
 import 'package:bring_me/src/data/repository/player_repository/player_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -29,6 +30,8 @@ class PlayerController extends GetxController {
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
       _playerSubscription;
 
+  StreamSubscription<User?>? _authSubscription;
+
   // Avatar Selection
   final avatarIndex = 0.obs;
   final isAvatarHeaderSelected = true.obs;
@@ -49,6 +52,7 @@ class PlayerController extends GetxController {
   @override
   void onClose() {
     _playerSubscription?.cancel();
+    _authSubscription?.cancel();
     super.onClose();
   }
 
@@ -114,24 +118,34 @@ class PlayerController extends GetxController {
   void streamPlayerInfo() {
     try {
       if (_playerRepository.authUser?.uid != null) {
-        _playerSubscription = _playerRepository
-            .playerStream()
-            .listen((playerSnapshot) {
-          if (playerSnapshot.exists) {
-            playerInfo.value = PlayerModel.fromSnapshot(playerSnapshot);
-            avatarIndex.value = playerInfo.value.avatarIndex;
-            usernameController.text = playerInfo.value.username;
-            TLoggerHelper.info(playerInfo.value.toString());
-          } else {
-            throw 'Username does not exist';
-          }
-        });
+        _playerSubscription = _playerRepository.playerStream().listen(
+          (playerSnapshot) {
+            if (playerSnapshot.exists) {
+              playerInfo.value = PlayerModel.fromSnapshot(playerSnapshot);
+              avatarIndex.value = playerInfo.value.avatarIndex;
+              usernameController.text = playerInfo.value.username;
+              TLoggerHelper.info(playerInfo.value.toString());
+            } else {
+              TLoggerHelper.warning('Player does not exist.');
+            }
+          },
+        );
       } else {
-        TLoggerHelper.warning('Username does not exist');
+        _listenToAuthChanges();
       }
     } catch (e) {
-      TLoggerHelper.error(e.toString());
+      TLoggerHelper.error('Error starting stream: $e');
     }
+  }
+
+  void _listenToAuthChanges() {
+    _authSubscription = _playerRepository.authStateChanges().listen((user) {
+      if (user != null) {
+        streamPlayerInfo();
+      } else {
+        TLoggerHelper.info('User is not authenticated.');
+      }
+    });
   }
 
   Future<void> updateSingleHighScore(int newSingleScore) async {

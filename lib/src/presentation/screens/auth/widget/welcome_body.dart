@@ -13,6 +13,7 @@ class TWelcomeBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Positioned(
       bottom: Get.height / 6,
+      left: 0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -1,17 +1,15 @@
 import 'package:bring_me/src/core/common/widgets/button/elevated_gradient_button.dart';
-import 'package:bring_me/src/core/utils/popups/popups.dart';
 import 'package:bring_me/src/core/utils/validators/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 import '../../../../core/config/colors.dart';
 import '../../../../core/config/enums.dart';
 import '../../../../core/config/sizes.dart';
 import '../../../controllers/home_controller/home_controller.dart';
+import '../../qr_scanner/qr_scanner_card.dart';
 import 'home_location_button.dart';
-import 'home_qr_card.dart';
 
 class THomeBottomSheet {
   static void show({
@@ -93,28 +91,8 @@ class THomeBottomSheet {
                       style: Theme.of(Get.context!).textTheme.headlineSmall,
                     ),
                     SizedBox(height: TSizes.spaceBtwItems),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: THomeQrCard(
-                              icon: Iconsax.gallery,
-                              onPressed: () => TPopup.warningSnackbar(
-                                  title: 'Coming Soon',
-                                  message: 'This feature will be up soon'),
-                            ),
-                          ),
-                          SizedBox(width: TSizes.sm),
-                          Expanded(
-                            child: THomeQrCard(
-                              icon: Icons.qr_code_scanner_rounded,
-                              onPressed: () => TPopup.warningSnackbar(
-                                  title: 'Coming Soon',
-                                  message: 'This feature will be up soon'),
-                            ),
-                          ),
-                        ],
-                      ),
+                    const Expanded(
+                      child: QRScannerCard(),
                     ),
                   ],
                 ),

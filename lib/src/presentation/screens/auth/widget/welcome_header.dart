@@ -15,7 +15,7 @@ class TWelcomeHeader extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         Positioned(
-          top: kToolbarHeight * 3.2,
+          top: kToolbarHeight * 2,
           child: Lottie.asset(
             LottieAsset.gemini,
             height: 100.h,
@@ -24,7 +24,7 @@ class TWelcomeHeader extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: kToolbarHeight * 2,
+          top: kToolbarHeight * 1,
           child: Lottie.asset(
             LottieAsset.lines,
             reverse: true,

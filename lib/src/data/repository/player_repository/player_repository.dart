@@ -1,10 +1,13 @@
 import 'package:bring_me/src/core/utils/exceptions/firebase_auth_exceptions.dart';
 import 'package:bring_me/src/data/repository/player_repository/player_model.dart';
+import 'package:bring_me/src/data/services/internet/internet_service.dart';
 import 'package:bring_me/src/presentation/screens/auth/welcome.dart';
 import 'package:bring_me/src/presentation/screens/home/home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/exceptions/firebase_exceptions.dart';
@@ -18,18 +21,25 @@ class PlayerRepository extends GetxService {
   final _auth = FirebaseAuth.instance;
   User? get authUser => _auth.currentUser;
 
+  final _internet = InternetService.instance;
+
   @override
   void onReady() {
+    FlutterNativeSplash.remove();
     screenRedirect();
     super.onReady();
   }
 
   screenRedirect() async {
     final user = _auth.currentUser;
-    if (user == null) {
+    final isConnected = await _internet.isConnected();
+    if (user == null && isConnected) {
       Get.offAll(() => const WelcomeScreen());
-    } else {
+    } else if (user != null && isConnected) {
       Get.offAll(() => const HomeScreen());
+    } else {
+      Get.offAll(() => const Scaffold());
+      _internet.showNoInternetDialog(shouldRedirectToHome: true);
     }
   }
 
@@ -175,6 +185,22 @@ class PlayerRepository extends GetxService {
       throw TPlatformException(e.code).message;
     } catch (e) {
       throw 'Error while listening to player: $e';
+    }
+  }
+
+  Stream<User?> authStateChanges() {
+    try {
+      return _auth.authStateChanges();
+    } on FirebaseAuthException catch (e) {
+      throw TFirebaseAuthException(e.code).message;
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Error while listening to auth changes: $e';
     }
   }
 }

@@ -3,12 +3,10 @@ import 'package:bring_me/src/presentation/controllers/player_controller/player_c
 import 'package:get/get.dart';
 
 import '../../data/repository/gemini_repository/gemini_repository.dart';
-import '../../data/services/internet/internet_service.dart';
 
 class GeneralBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put(InternetService());
     Get.put(GeminiRepository());
     Get.put(PlayerController(), permanent: true);
     Get.lazyPut(() => RoomRepository());

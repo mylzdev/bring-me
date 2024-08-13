@@ -1,5 +1,6 @@
 import 'package:bring_me/src/core/utils/theme/widget_themes/tooltip_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../config/colors.dart';
 import 'widget_themes/appbar_theme.dart';
@@ -20,7 +21,7 @@ class TAppTheme {
     disabledColor: TColors.grey,
     brightness: Brightness.dark,
     primaryColor: TColors.primary,
-    textTheme: TTextTheme.darkTextTheme,
+    textTheme: TTextTheme.darkTextTheme.apply(fontSizeFactor: 1.0.sp),
     chipTheme: TChipTheme.darkChipTheme,
     scaffoldBackgroundColor: TColors.dark,
     appBarTheme: TAppBarTheme.darkAppBarTheme,

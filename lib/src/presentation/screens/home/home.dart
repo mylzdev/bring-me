@@ -72,7 +72,7 @@ class HomeScreen extends GetView<HomeController> {
                 ),
                 const Spacer(),
                 // Play buttons
-                THomePlayButtons(controller: controller),
+                THomePlayButtons(homeController: controller),
                 const Spacer(),
                 THomeFooter(controller: controller),
               ],

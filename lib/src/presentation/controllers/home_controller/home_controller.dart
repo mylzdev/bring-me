@@ -48,7 +48,8 @@ class HomeController extends GetxController {
   Future<void> createRoom() async {
     try {
       TFullScreenLoader.openLoadingDialog('Creating room');
-      roomID.value = THelperFunctions.generateRoomID();
+      roomID.value = THelperFunctions
+          .generateRoomID(); // TODO : Fix where can be duplicated
 
       final room = RoomModel(
           roomID: roomID.value,
@@ -75,7 +76,7 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> joinRoom() async {
+  Future<void> joinRoomViaCode() async {
     try {
       if (!joinRoomState.currentState!.validate()) return;
 
@@ -91,6 +92,20 @@ class HomeController extends GetxController {
       TLoggerHelper.error(e.toString());
       TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
       TFullScreenLoader.stopLoading();
+    }
+  }
+
+  Future<void> joinRoomViaQR(String qrCodeResult) async {
+    try {
+      final updatedRoom = await RoomRepository.instance.joinRoom(
+        qrCodeResult,
+        _playerController.playerInfo.value,
+      );
+      roomInfo.value = updatedRoom;
+
+      Get.offAll(() => const RoomScreen());
+    } catch (e) {
+      rethrow;
     }
   }
 

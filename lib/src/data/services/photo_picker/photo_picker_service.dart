@@ -26,6 +26,20 @@ class PhotoPickerService {
     }
   }
 
+  Future<XFile?> pickImage() async {
+    try {
+      final photo = await _imagePicker.pickImage(source: ImageSource.gallery);
+
+      if (photo == null) throw const PhotoPickerException();
+
+      return photo;
+    } on PhotoPickerException catch (e) {
+      throw PhotoPickerException(e.message).message;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
   Future<Uint8List> pickPhoto() async {
     try {
       final photo = await _imagePicker.pickImage(source: ImageSource.gallery);

@@ -1,3 +1,5 @@
+import 'package:bring_me/src/core/utils/logging/logger.dart';
+import 'package:bring_me/src/presentation/screens/home/home.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,7 +22,8 @@ class InternetService extends GetxService {
   void _updateConnectivityStatus(List<ConnectivityResult> connectivityResult) {
     if (connectivityResult.contains(ConnectivityResult.none)) {
       if (!(Get.isDialogOpen ?? false)) {
-        _showNoInternetDialog();
+        TLoggerHelper.info('NO INTERNET');
+        showNoInternetDialog();
       }
     }
   }
@@ -37,7 +40,7 @@ class InternetService extends GetxService {
     }
   }
 
-  void _showNoInternetDialog() {
+  void showNoInternetDialog({bool shouldRedirectToHome = false}) {
     Get.defaultDialog(
       barrierDismissible: false,
       backgroundColor: TColors.darkContainer,
@@ -51,7 +54,17 @@ class InternetService extends GetxService {
           return !_isConnectedClick.value
               ? Center(
                   child: ElevatedButton(
-                    onPressed: () => _attemptReconnect(),
+                    onPressed: () async {
+                      final reconnected = await _attemptReconnect();
+                      if (reconnected) {
+                        if (shouldRedirectToHome) {
+                          _isConnectedClick.value = false;
+                          Get.offAll(() => const HomeScreen());
+                        } else {
+                          _closeNoInternetDialog();
+                        }
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                     ),
@@ -66,18 +79,19 @@ class InternetService extends GetxService {
 
   Future<bool> _pop() async => false;
 
-  Future<void> _attemptReconnect() async {
+  Future<bool> _attemptReconnect() async {
     _isConnectedClick.value = true;
     final connected = await isConnected();
     if (connected) {
-      _closeNoInternetDialog();
+      return true;
     } else {
       final reconnected = await isConnected();
       if (reconnected) {
-        _closeNoInternetDialog();
+        return true;
       }
       await Future.delayed(const Duration(seconds: 1));
       _isConnectedClick.value = false;
+      return false;
     }
   }
 
