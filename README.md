@@ -7,7 +7,7 @@
 
 # Bring Me - Multiplayer Game
 
-Bring Me is a mobile game where players are tasked with finding and bringing specific items to the host. The game features a dynamic and interactive environment driven by the Google Gemini API.
+Bring Me is a mobile game where players are tasked with finding and bringing specific items to the host. The game features a dynamic and interactive environment driven by the Google Gemini API. Check out our [YouTube video](https://www.youtube.com/watch?v=dnjS-gkLxPo) to see the app in action as part of the Google Gemini API Developer competition!
 
 ## 🎉 Minor Release! 🎉
 We are excited to introduce the minor release of **Bring Me**, your new go-to game for fun and excitement! 
@@ -41,7 +41,7 @@ Bring Me is released under the [MIT-License](LICENSE). Feel free to use, modify,
 
 Special thanks to [Flutter](https://flutter.dev/) and [Dart](https://dart.dev/) teams for creating such amazing tools. 
 
-We hope you enjoy using Moodlet and find it helpful in tracking and understanding your emotional journey!
+Thank you for being part of our journey. This is just the beginning—more features and fun are on the way! 
 
 ## Support
 
