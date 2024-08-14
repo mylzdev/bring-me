@@ -1,9 +1,9 @@
-import 'package:bring_me/src/core/common/widgets/button/elevated_gradient_button.dart';
-import 'package:bring_me/src/core/config/enums.dart';
-import 'package:bring_me/src/presentation/controllers/room_controller/room_controller.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/common/widgets/button/elevated_gradient_button.dart';
+import '../../../../core/config/enums.dart';
 import '../../../../core/config/sizes.dart';
+import '../../../controllers/room_controller/room_controller.dart';
 
 class TMultiGameFooter extends StatelessWidget {
   const TMultiGameFooter({

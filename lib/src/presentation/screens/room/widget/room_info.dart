@@ -1,4 +1,3 @@
-import 'package:bring_me/src/presentation/screens/room/widget/room_qr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,6 +8,7 @@ import '../../../../core/common/widgets/text/icon_text.dart';
 import '../../../../core/config/sizes.dart';
 import '../../../../core/utils/helpers/helper_functions.dart';
 import '../../../controllers/room_controller/room_controller.dart';
+import 'room_qr.dart';
 
 class TRoomInfo extends StatelessWidget {
   const TRoomInfo({

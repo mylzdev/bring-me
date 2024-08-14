@@ -1,13 +1,13 @@
-import 'package:bring_me/src/core/common/widgets/avatar/avatar.dart';
-import 'package:bring_me/src/presentation/controllers/home_controller/home_binding.dart';
-import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
+import '../../../core/common/widgets/avatar/avatar.dart';
 import '../../../core/config/sizes.dart';
+import '../../controllers/home_controller/home_binding.dart';
 import '../../controllers/home_controller/home_controller.dart';
+import '../../controllers/player_controller/player_controller.dart';
 import 'widget/home_footer.dart';
 import 'widget/home_player_buttons.dart';
 import 'widget/home_player_score.dart';

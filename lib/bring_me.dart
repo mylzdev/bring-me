@@ -15,7 +15,7 @@ class BringMe extends StatelessWidget {
   Widget build(BuildContext context) {
     return DevicePreview(
       backgroundColor: TColors.dark,
-      enabled: kReleaseMode, // TODO : add !
+      enabled: !kReleaseMode,
       builder: (context) => ScreenUtilInit(
         designSize: const Size(411, 853),
         minTextAdapt: true,

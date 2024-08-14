@@ -1,21 +1,21 @@
 import 'dart:math' as math;
 
-import 'package:bring_me/src/core/common/widgets/dialog/custom_dialog.dart';
-import 'package:bring_me/src/core/config/lottie.dart';
-import 'package:bring_me/src/core/config/text_strings.dart';
-import 'package:bring_me/src/core/utils/device/local_storage_key.dart';
-import 'package:bring_me/src/core/utils/popups/popups.dart';
-import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
-import 'package:bring_me/src/presentation/screens/home/home.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
+import '../../../core/common/widgets/dialog/custom_dialog.dart';
 import '../../../core/config/enums.dart';
+import '../../../core/config/lottie.dart';
+import '../../../core/config/text_strings.dart';
+import '../../../core/utils/device/local_storage_key.dart';
 import '../../../core/utils/logging/logger.dart';
+import '../../../core/utils/popups/popups.dart';
 import '../../../data/repository/gemini_repository/gemini_repository.dart';
 import '../../../data/repository/room_repository/room_player_model.dart';
 import '../../../data/services/photo_picker/photo_picker_service.dart';
+import '../../screens/home/home.dart';
 import '../home_controller/home_controller.dart';
+import '../player_controller/player_controller.dart';
 
 class SingleGameController extends GetxController {
   static SingleGameController get instance => Get.find();
@@ -121,7 +121,7 @@ class SingleGameController extends GetxController {
 
   Future<void> validateImage() async {
     try {
-      final photo = await _photoPickerService.pickPhoto();
+      final photo = await _photoPickerService.takePhoto();
       itemHuntStatus.value = ItemHuntStatus.validationInProgress;
       final isPhotoValid =
           await GeminiRepository.instance.validateImage(currentitem, photo);
@@ -139,6 +139,7 @@ class SingleGameController extends GetxController {
       }
     } catch (e) {
       TLoggerHelper.error(e.toString());
+      TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
       itemHuntStatus.value = ItemHuntStatus.validationFailure;
       resetItemStatus();
     }

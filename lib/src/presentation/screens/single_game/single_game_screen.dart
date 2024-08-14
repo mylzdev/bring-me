@@ -1,6 +1,3 @@
-import 'package:bring_me/src/core/utils/helpers/helper_functions.dart';
-import 'package:bring_me/src/presentation/controllers/single_game_controller/single_game_binding.dart';
-import 'package:bring_me/src/presentation/controllers/single_game_controller/single_game_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,6 +5,9 @@ import '../../../core/common/widgets/appbar/appbar.dart';
 import '../../../core/config/colors.dart';
 import '../../../core/config/enums.dart';
 import '../../../core/config/sizes.dart';
+import '../../../core/utils/helpers/helper_functions.dart';
+import '../../controllers/single_game_controller/single_game_binding.dart';
+import '../../controllers/single_game_controller/single_game_controller.dart';
 import 'widget/single_game_footer.dart';
 import 'widget/single_game_loader.dart';
 import 'widget/single_game_progress.dart';

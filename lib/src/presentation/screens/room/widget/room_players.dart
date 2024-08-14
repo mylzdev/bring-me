@@ -1,11 +1,11 @@
-import 'package:bring_me/src/data/repository/player_repository/player_avatar_model.dart';
-import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
 import '../../../../core/common/widgets/avatar/avatar.dart';
+import '../../../../data/repository/player_repository/player_avatar_model.dart';
+import '../../../controllers/player_controller/player_controller.dart';
 import '../../../controllers/room_controller/room_controller.dart';
 
 class TRoomPlayers extends StatelessWidget {

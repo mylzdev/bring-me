@@ -6,7 +6,6 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 
 import '../../../core/config/enums.dart';
 import '../../../core/utils/exceptions/gemini_exception.dart';
-import '../../../core/utils/logging/logger.dart';
 import 'gemini_client.dart';
 
 class GeminiRepository extends GetxService {
@@ -22,21 +21,20 @@ class GeminiRepository extends GetxService {
       final response = await _client.generateScavengerHuntItems(location);
 
       if (response == null) {
-        throw const GeminiRepositoryException('Response is empty');
+        throw const GeminiRepositoryException(
+            'Failed to get response from Gemini');
       }
 
       if (jsonDecode(response) case {'items': List<dynamic> items}) {
         return List<String>.from(items);
       }
 
-      throw const GeminiRepositoryException('Invalid JSON schema');
-    } on GenerativeAIException catch (e) {
-      throw GeminiRepositoryException(
-          'Problem with the Generative AI service: $e');
+      throw const GeminiRepositoryException('Invalid response from Gemini');
+    } on GenerativeAIException catch (_) {
+      throw const GeminiRepositoryException(
+          'Problem with the Generative AI service');
     } catch (e) {
-      if (e is GeminiRepositoryException) rethrow;
-
-      throw const GeminiRepositoryException();
+      throw 'Problem with Generative AI Service. Please try again';
     }
   }
 
@@ -45,21 +43,19 @@ class GeminiRepository extends GetxService {
       final response = await _client.validateImage(item, image);
 
       if (response == null) {
-        throw const GeminiRepositoryException('Response is empty');
+        throw const GeminiRepositoryException(
+            'Failed to get response from Gemini');
       }
 
       if (jsonDecode(response) case {'valid': bool valid}) return valid;
 
-      throw const GeminiRepositoryException('Invalid JSON schema');
+      throw const GeminiRepositoryException('Invalid response from Gemini');
     } on GenerativeAIException {
       throw const GeminiRepositoryException(
         'Problem with the Generative AI service',
       );
     } catch (e) {
-      TLoggerHelper.error(e.toString());
-      if (e is GeminiRepositoryException) rethrow;
-
-      throw const GeminiRepositoryException();
+      throw 'Problem with Generative AI Service. Please try again';
     }
   }
 
@@ -73,10 +69,7 @@ class GeminiRepository extends GetxService {
 
       throw const GeminiRepositoryException('Invalid JSON schema');
     } catch (e) {
-      TLoggerHelper.error(e.toString());
-      if (e is GeminiRepositoryException) rethrow;
-
-      throw const GeminiRepositoryException();
+      throw 'Problem with Generative AI Service. Please try again';
     }
   }
 }

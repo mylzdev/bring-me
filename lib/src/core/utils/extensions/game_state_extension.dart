@@ -1,4 +1,4 @@
-import 'package:bring_me/src/core/config/enums.dart';
+import '../../config/enums.dart';
 
 extension GameStateExtension on GameState {
   String get name => toString().split('.').last;

@@ -1,5 +1,3 @@
-import 'package:bring_me/src/presentation/controllers/qr_scanner_controller/qr_scanner_binding.dart';
-import 'package:bring_me/src/presentation/controllers/qr_scanner_controller/qr_scanner_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,6 +6,8 @@ import '../../../../core/common/widgets/button/outline_gradient_button.dart';
 import '../../../../core/config/colors.dart';
 import '../../../../core/config/sizes.dart';
 import '../../../controllers/home_controller/home_controller.dart';
+import '../../../controllers/qr_scanner_controller/qr_scanner_binding.dart';
+import '../../../controllers/qr_scanner_controller/qr_scanner_controller.dart';
 import 'home_bottom_sheet.dart';
 
 class THomePlayButtons extends GetView<QrScannerController> {

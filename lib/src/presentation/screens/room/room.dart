@@ -1,9 +1,9 @@
-import 'package:bring_me/src/presentation/controllers/room_controller/room_binding.dart';
-import 'package:bring_me/src/presentation/controllers/room_controller/room_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/config/sizes.dart';
+import '../../controllers/room_controller/room_binding.dart';
+import '../../controllers/room_controller/room_controller.dart';
 import 'widget/room_action_button.dart';
 import 'widget/room_info.dart';
 import 'widget/room_players.dart';

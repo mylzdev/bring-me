@@ -1,4 +1,3 @@
-import 'package:bring_me/src/presentation/controllers/room_controller/room_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,6 +8,7 @@ import '../../../../core/common/widgets/container/custom_container.dart';
 import '../../../../core/config/colors.dart';
 import '../../../../core/config/sizes.dart';
 import '../../../controllers/player_controller/player_controller.dart';
+import '../../../controllers/room_controller/room_controller.dart';
 
 class RoomQR {
   static void show(RoomController controller) {

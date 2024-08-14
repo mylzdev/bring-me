@@ -1,17 +1,17 @@
-import 'package:bring_me/src/core/common/widgets/appbar/appbar.dart';
-import 'package:bring_me/src/core/common/widgets/container/custom_container.dart';
-import 'package:bring_me/src/core/config/colors.dart';
-import 'package:bring_me/src/core/config/enums.dart';
-import 'package:bring_me/src/core/config/lottie.dart';
-import 'package:bring_me/src/core/config/sizes.dart';
-import 'package:bring_me/src/core/utils/helpers/helper_functions.dart';
-import 'package:bring_me/src/presentation/controllers/room_controller/room_controller.dart';
 import 'package:custom_rating_bar/custom_rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../../core/common/widgets/appbar/appbar.dart';
+import '../../../core/common/widgets/container/custom_container.dart';
+import '../../../core/config/colors.dart';
+import '../../../core/config/enums.dart';
+import '../../../core/config/lottie.dart';
+import '../../../core/config/sizes.dart';
+import '../../../core/utils/helpers/helper_functions.dart';
+import '../../controllers/room_controller/room_controller.dart';
 import 'widgets/multi_game_footer.dart';
 import 'widgets/multi_game_header.dart';
 import 'widgets/placing_badge.dart';

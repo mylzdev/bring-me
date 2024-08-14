@@ -1,12 +1,12 @@
-import 'package:bring_me/src/core/common/widgets/button/elevated_gradient_button.dart';
-import 'package:bring_me/src/core/utils/validators/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
+import '../../../../core/common/widgets/button/elevated_gradient_button.dart';
 import '../../../../core/config/colors.dart';
 import '../../../../core/config/enums.dart';
 import '../../../../core/config/sizes.dart';
+import '../../../../core/utils/validators/validation.dart';
 import '../../../controllers/home_controller/home_controller.dart';
 import '../../qr_scanner/qr_scanner_card.dart';
 import 'home_location_button.dart';

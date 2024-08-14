@@ -1,6 +1,7 @@
-import 'package:bring_me/src/core/config/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:outline_gradient_button/outline_gradient_button.dart';
+
+import '../../../config/sizes.dart';
 
 class TOutlineGradientButton extends StatelessWidget {
   const TOutlineGradientButton({
@@ -31,10 +32,11 @@ class TOutlineGradientButton extends StatelessWidget {
         ],
       ),
       child: Center(
-          child: Text(
-        text,
-        style: const TextStyle(fontWeight: FontWeight.w600),
-      )),
+        child: Text(
+          text,
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+      ),
     );
   }
 }

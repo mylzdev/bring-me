@@ -1,6 +1,6 @@
-import 'package:bring_me/src/core/config/sizes.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/config/sizes.dart';
 import 'widget/welcome_body.dart';
 import 'widget/welcome_footer.dart';
 import 'widget/welcome_header.dart';

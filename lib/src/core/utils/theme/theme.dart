@@ -1,4 +1,3 @@
-import 'package:bring_me/src/core/utils/theme/widget_themes/tooltip_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -11,6 +10,7 @@ import 'widget_themes/elevated_button_theme.dart';
 import 'widget_themes/outlined_button_theme.dart';
 import 'widget_themes/text_field_theme.dart';
 import 'widget_themes/text_theme.dart';
+import 'widget_themes/tooltip_theme.dart';
 
 class TAppTheme {
   TAppTheme._();

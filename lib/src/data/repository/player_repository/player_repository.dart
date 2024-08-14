@@ -1,8 +1,3 @@
-import 'package:bring_me/src/core/utils/exceptions/firebase_auth_exceptions.dart';
-import 'package:bring_me/src/data/repository/player_repository/player_model.dart';
-import 'package:bring_me/src/data/services/internet/internet_service.dart';
-import 'package:bring_me/src/presentation/screens/auth/welcome.dart';
-import 'package:bring_me/src/presentation/screens/home/home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,9 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 
+import '../../../core/utils/exceptions/firebase_auth_exceptions.dart';
 import '../../../core/utils/exceptions/firebase_exceptions.dart';
 import '../../../core/utils/exceptions/format_exceptions.dart';
 import '../../../core/utils/exceptions/platform_exceptions.dart';
+import '../../../presentation/screens/auth/welcome.dart';
+import '../../../presentation/screens/home/home.dart';
+import '../../services/internet/internet_service.dart';
+import 'player_model.dart';
 
 class PlayerRepository extends GetxService {
   static PlayerRepository get instance => Get.find();
@@ -55,7 +55,7 @@ class PlayerRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Something went wrong while signing anonymously: $e';
+      throw 'Something went wrong while signing anonymously';
     }
   }
 
@@ -71,10 +71,7 @@ class PlayerRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      if (e == 'username-taken') {
-        throw 'Username already taken';
-      }
-      throw 'Something went wrong. Please try again: $e';
+      throw 'Something went wrong while creating a user. Please try again';
     }
   }
 
@@ -96,7 +93,7 @@ class PlayerRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Something went wrong. Please try again: $e';
+      throw 'Something went wrong while updating player name. Please try again';
     }
   }
 
@@ -118,7 +115,7 @@ class PlayerRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Something went wrong. Please try again: $e';
+      throw 'Something went wrong while updating player avatar. Please try again';
     }
   }
 
@@ -143,7 +140,7 @@ class PlayerRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Error while updating to player single high score: $e';
+      throw 'Something went wrong while updating single game score. Please try';
     }
   }
 
@@ -168,7 +165,7 @@ class PlayerRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Error while updating to player multi high score: $e';
+      throw 'Something went wrong while updating to player multigame score';
     }
   }
 

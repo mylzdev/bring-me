@@ -1,22 +1,26 @@
+import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:bring_me/src/core/utils/popups/loader.dart';
-import 'package:bring_me/src/data/repository/room_repository/room_model.dart';
-import 'package:bring_me/src/data/repository/room_repository/room_player_model.dart';
-import 'package:bring_me/src/data/repository/room_repository/room_repository.dart';
-import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
-import 'package:bring_me/src/presentation/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/config/enums.dart';
 import '../../../core/config/text_strings.dart';
 import '../../../core/utils/helpers/helper_functions.dart';
 import '../../../core/utils/logging/logger.dart';
+import '../../../core/utils/popups/loader.dart';
 import '../../../core/utils/popups/popups.dart';
 import '../../../data/repository/gemini_repository/gemini_repository.dart';
+import '../../../data/repository/room_repository/room_model.dart';
+import '../../../data/repository/room_repository/room_player_model.dart';
+import '../../../data/repository/room_repository/room_repository.dart';
+import '../../../data/services/photo_picker/photo_picker_service.dart';
+import '../../screens/home/home.dart';
 import '../../screens/room/room.dart';
 import '../../screens/single_game/single_game_screen.dart';
+import '../player_controller/player_controller.dart';
 import '../room_controller/room_controller.dart';
 
 class HomeController extends GetxController {
@@ -38,6 +42,11 @@ class HomeController extends GetxController {
 
   void setMaxUser(double value) => maxPlayers.value = value;
   void setHuntLocation(HuntLocation location) => huntLocation.value = location;
+
+  // QR
+  final _photoPicker = PhotoPickerService();
+  final mobileController =
+      MobileScannerController(detectionSpeed: DetectionSpeed.noDuplicates);
 
   @override
   void onInit() {
@@ -127,6 +136,38 @@ class HomeController extends GetxController {
       Get.to(() => const HomeScreen());
       TLoggerHelper.error(e.toString());
       TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
+    }
+  }
+
+  Future<void> scanQrFromImage() async {
+    try {
+      final XFile? image = await _photoPicker.pickImage();
+
+      if (image != null) {
+        try {
+          TFullScreenLoader.openLoadingDialog('Joining room');
+
+          final File imageFile = File(image.path);
+          final result = await mobileController.analyzeImage(imageFile.path);
+
+          if (result != null && result.barcodes.isNotEmpty) {
+            final qrCode = result.barcodes.first.rawValue;
+            await HomeController.instance.joinRoomViaQR(qrCode!);
+          } else {
+            TLoggerHelper.warning('No QR Code found in the image.');
+            TPopup.warningSnackbar(
+                title: TTexts.ohSnap,
+                message: 'No QR Code found in the image.');
+            TFullScreenLoader.stopLoading();
+          }
+        } catch (e) {
+          TLoggerHelper.error('Error scanning QR code from image: $e');
+          TFullScreenLoader.stopLoading();
+          TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
+        }
+      }
+    } catch (e) {
+      TLoggerHelper.error(e.toString());
     }
   }
 }

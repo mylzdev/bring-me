@@ -1,3 +1,4 @@
+import 'package:bring_me/src/presentation/controllers/home_controller/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -18,7 +19,7 @@ class QRScannerCard extends StatelessWidget {
         Expanded(
           child: THomeQrCard(
             icon: Iconsax.gallery,
-            onPressed: () {} // TODO : Separate the qr image scan from qr controller,
+            onPressed: () => HomeController.instance.scanQrFromImage(),
           ),
         ),
         SizedBox(width: TSizes.sm),

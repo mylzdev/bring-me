@@ -1,8 +1,8 @@
-import 'package:bring_me/src/data/repository/room_repository/room_repository.dart';
-import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
 import 'package:get/get.dart';
 
 import '../../data/repository/gemini_repository/gemini_repository.dart';
+import '../../data/repository/room_repository/room_repository.dart';
+import '../../presentation/controllers/player_controller/player_controller.dart';
 
 class GeneralBinding extends Bindings {
   @override

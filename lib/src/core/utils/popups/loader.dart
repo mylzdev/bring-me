@@ -1,9 +1,9 @@
-import 'package:bring_me/src/core/config/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../config/lottie.dart';
 import '../../config/sizes.dart';
 
 class TFullScreenLoader {

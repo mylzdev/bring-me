@@ -1,9 +1,9 @@
-import 'package:bring_me/src/core/utils/extensions/game_state_extension.dart';
-import 'package:bring_me/src/core/utils/extensions/hunt_location_extension.dart';
-import 'package:bring_me/src/data/repository/room_repository/room_player_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../core/config/enums.dart';
+import '../../../core/utils/extensions/game_state_extension.dart';
+import '../../../core/utils/extensions/hunt_location_extension.dart';
+import 'room_player_model.dart';
 
 class RoomModel {
   String roomID;

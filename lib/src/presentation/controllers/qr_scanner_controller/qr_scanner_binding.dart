@@ -1,5 +1,6 @@
-import 'package:bring_me/src/presentation/controllers/qr_scanner_controller/qr_scanner_controller.dart';
 import 'package:get/get.dart';
+
+import 'qr_scanner_controller.dart';
 
 class QrScannerBinding extends Bindings {
   @override

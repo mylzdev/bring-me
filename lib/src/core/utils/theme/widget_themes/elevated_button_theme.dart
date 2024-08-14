@@ -17,7 +17,7 @@ class TElevatedButtonTheme {
       disabledBackgroundColor: TColors.darkerGrey,
       side: BorderSide.none,
       padding: EdgeInsets.symmetric(vertical: TSizes.buttonHeight),
-      textStyle: const TextStyle(color: TColors.textWhite, fontWeight: FontWeight.w600),
+      textStyle: const TextStyle(color: TColors.textWhite, fontWeight: FontWeight.w500),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TSizes.buttonRadius)),
     ),
   );

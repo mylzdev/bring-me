@@ -1,10 +1,10 @@
 import 'dart:math';
 
-import 'package:bring_me/src/core/config/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../config/enums.dart';
 import '../../config/text_strings.dart';
 import '../popups/popups.dart';
 

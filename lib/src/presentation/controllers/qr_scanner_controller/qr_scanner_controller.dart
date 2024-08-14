@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:bring_me/src/core/config/text_strings.dart';
-import 'package:bring_me/src/core/utils/logging/logger.dart';
-import 'package:bring_me/src/core/utils/popups/popups.dart';
-import 'package:bring_me/src/data/services/photo_picker/photo_picker_service.dart';
-import 'package:bring_me/src/presentation/controllers/home_controller/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../core/config/text_strings.dart';
+import '../../../core/utils/logging/logger.dart';
 import '../../../core/utils/popups/loader.dart';
+import '../../../core/utils/popups/popups.dart';
+import '../../../data/services/photo_picker/photo_picker_service.dart';
+import '../home_controller/home_controller.dart';
 
 class QrScannerController extends GetxController with WidgetsBindingObserver {
   static QrScannerController get instance => Get.find();
@@ -83,7 +83,6 @@ class QrScannerController extends GetxController with WidgetsBindingObserver {
 
   void _handleBarcode(BarcodeCapture barcode) async {
     if (barcode.barcodes.isEmpty) {
-      // No barcode detected, nothing to do
       TLoggerHelper.info('EMPTY');
       return;
     }
@@ -92,10 +91,8 @@ class QrScannerController extends GetxController with WidgetsBindingObserver {
         TFullScreenLoader.openLoadingDialog('Joining room');
 
         final String? rawValue = code.rawValue;
-        // Handle the barcode content here.
         TLoggerHelper.warning('Scanned QR Code: $rawValue');
         await HomeController.instance.joinRoomViaQR(rawValue!);
-        // Stop scanning after a successful scan
         unawaited(mobileController.stop());
       }
     } catch (e) {

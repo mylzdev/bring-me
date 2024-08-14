@@ -1,11 +1,13 @@
-import 'package:bring_me/src/presentation/controllers/qr_scanner_controller/qr_scanner_binding.dart';
-import 'package:bring_me/src/presentation/controllers/qr_scanner_controller/qr_scanner_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 
+import '../../../core/config/colors.dart';
 import '../../../core/config/sizes.dart';
 import '../../../core/utils/logging/logger.dart';
+import '../../controllers/qr_scanner_controller/qr_scanner_binding.dart';
+import '../../controllers/qr_scanner_controller/qr_scanner_controller.dart';
 
 class THomeQRScanner extends GetView<QrScannerController> {
   const THomeQRScanner({
@@ -21,23 +23,41 @@ class THomeQRScanner extends GetView<QrScannerController> {
           padding: EdgeInsets.all(
             TSizes.defaultSpace * 2,
           ),
-          child: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: double.maxFinite,
-                  height: Get.height * 0.4,
-                  child: MobileScanner(
-                    controller: controller.mobileController,
-                    errorBuilder: (p0, p1, p2) {
-                      TLoggerHelper.error(p1.errorDetails!.message!);
-                      return const SizedBox();
-                    },
+          child: Center(
+            child: SizedBox(
+              width: double.maxFinite,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  AspectRatio(
+                    aspectRatio: 1 / 1,
+                    child: Padding(
+                      padding: EdgeInsets.all(TSizes.lg),
+                      child: ClipRRect(
+                        borderRadius:
+                            BorderRadius.circular(TSizes.cardRadiusLg),
+                        child: MobileScanner(
+                          controller: controller.mobileController,
+                          errorBuilder: (p0, p1, p2) {
+                            TLoggerHelper.error(p1.errorDetails!.message!);
+                            return const SizedBox();
+                          },
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  QRScannerOverlay(
+                    scanAreaWidth: double.maxFinite,
+                    scanAreaHeight: Get.height * 0.4,
+                    borderColor: TColors.primary,
+                    overlayColor: Colors.transparent,
+                  ),
+                  const Positioned(
+                    bottom: 0,
+                    child: Text('Place the QR inside the scanner'),
+                  )
+                ],
+              ),
             ),
           ),
         ),

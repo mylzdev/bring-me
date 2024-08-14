@@ -1,4 +1,3 @@
-import 'package:bring_me/src/core/config/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../../../core/common/widgets/container/custom_container.dart';
+import '../../../../core/config/enums.dart';
 import '../../../../core/config/lottie.dart';
 import '../../../controllers/room_controller/room_controller.dart';
 import 'multi_game_header_content.dart';

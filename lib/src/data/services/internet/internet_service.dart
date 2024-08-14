@@ -1,10 +1,10 @@
-import 'package:bring_me/src/core/utils/logging/logger.dart';
-import 'package:bring_me/src/presentation/screens/home/home.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/config/colors.dart';
+import '../../../core/utils/logging/logger.dart';
+import '../../../presentation/screens/home/home.dart';
 
 /// Manages the network connectivity status and provides methods to check and handle connectivity changes.
 class InternetService extends GetxService {

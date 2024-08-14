@@ -1,10 +1,5 @@
 import 'dart:async';
 
-import 'package:bring_me/src/core/utils/device/local_storage_key.dart';
-import 'package:bring_me/src/core/utils/popups/loader.dart';
-import 'package:bring_me/src/data/repository/player_repository/player_avatar_model.dart';
-import 'package:bring_me/src/data/repository/player_repository/player_model.dart';
-import 'package:bring_me/src/data/repository/player_repository/player_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +7,13 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import '../../../core/config/text_strings.dart';
+import '../../../core/utils/device/local_storage_key.dart';
 import '../../../core/utils/logging/logger.dart';
+import '../../../core/utils/popups/loader.dart';
 import '../../../core/utils/popups/popups.dart';
+import '../../../data/repository/player_repository/player_avatar_model.dart';
+import '../../../data/repository/player_repository/player_model.dart';
+import '../../../data/repository/player_repository/player_repository.dart';
 import '../../screens/home/home.dart';
 
 class PlayerController extends GetxController {

@@ -17,7 +17,7 @@ class GeminiClient {
     final prompt =
         'You are a scavenger hunt game where objects are found by taking a photo of them.'
         'Generate a list of $maxGeneratedItems tangible items that could be found in the following: $location.'
-        'The difficulty to find the items should be easy'
+        'The difficulty to find the items should be easy and tangible'
         'Keep the item name concise. All letters should be uppercase. Do not include articles (a, an, the).'
         'Provide your response as a JSON object with the following schema: {"items": ["", "", ...]}.'
         'Do not return your result as Markdown.';

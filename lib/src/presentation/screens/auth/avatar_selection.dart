@@ -1,15 +1,15 @@
-import 'package:bring_me/src/core/common/widgets/avatar/avatar.dart';
-import 'package:bring_me/src/core/common/widgets/button/animated_circle_button.dart';
-import 'package:bring_me/src/core/config/colors.dart';
-import 'package:bring_me/src/core/config/sizes.dart';
-import 'package:bring_me/src/data/repository/player_repository/player_avatar_model.dart';
-import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
-import 'package:bring_me/src/presentation/screens/auth/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../core/common/widgets/appbar/custom_header.dart';
+import '../../../core/common/widgets/avatar/avatar.dart';
+import '../../../core/common/widgets/button/animated_circle_button.dart';
+import '../../../core/config/colors.dart';
+import '../../../core/config/sizes.dart';
+import '../../../data/repository/player_repository/player_avatar_model.dart';
+import '../../controllers/player_controller/player_controller.dart';
+import 'auth.dart';
 
 class AvatarSelection extends StatelessWidget {
   const AvatarSelection({super.key, this.isUpdating = false});

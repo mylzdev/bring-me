@@ -1,8 +1,5 @@
 import 'dart:async';
 
-import 'package:bring_me/firebase_options.dart';
-import 'package:bring_me/src/data/repository/player_repository/player_repository.dart';
-import 'package:bring_me/src/data/services/internet/internet_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +10,10 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'bring_me.dart';
+import 'firebase_options.dart';
 import 'src/core/config/environment.dart';
+import 'src/data/repository/player_repository/player_repository.dart';
+import 'src/data/services/internet/internet_service.dart';
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();

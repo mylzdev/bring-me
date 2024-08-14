@@ -1,25 +1,25 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:bring_me/src/core/common/widgets/dialog/custom_dialog.dart';
-import 'package:bring_me/src/core/config/enums.dart';
-import 'package:bring_me/src/core/config/text_strings.dart';
-import 'package:bring_me/src/core/utils/logging/logger.dart';
-import 'package:bring_me/src/core/utils/popups/loader.dart';
-import 'package:bring_me/src/core/utils/popups/popups.dart';
-import 'package:bring_me/src/data/repository/room_repository/room_model.dart';
-import 'package:bring_me/src/data/repository/room_repository/room_repository.dart';
-import 'package:bring_me/src/presentation/controllers/home_controller/home_controller.dart';
-import 'package:bring_me/src/presentation/controllers/player_controller/player_controller.dart';
-import 'package:bring_me/src/presentation/screens/home/home.dart';
-import 'package:bring_me/src/presentation/screens/multi_game/multi_game.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../core/common/widgets/dialog/custom_dialog.dart';
+import '../../../core/config/enums.dart';
+import '../../../core/config/text_strings.dart';
+import '../../../core/utils/logging/logger.dart';
+import '../../../core/utils/popups/loader.dart';
+import '../../../core/utils/popups/popups.dart';
 import '../../../data/repository/gemini_repository/gemini_repository.dart';
+import '../../../data/repository/room_repository/room_model.dart';
 import '../../../data/repository/room_repository/room_player_model.dart';
+import '../../../data/repository/room_repository/room_repository.dart';
 import '../../../data/services/photo_picker/photo_picker_service.dart';
+import '../../screens/home/home.dart';
+import '../../screens/multi_game/multi_game.dart';
+import '../home_controller/home_controller.dart';
+import '../player_controller/player_controller.dart';
 
 class RoomController extends GetxController with WidgetsBindingObserver {
   static RoomController get instance => Get.find();
@@ -223,6 +223,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
       checkIfAllPlayersDone();
       TLoggerHelper.info('Score: ${score.value}, Item left: ${itemLeft.value}');
     } catch (e) {
+      _handleError(e, '_updatePlayerScoreAndItemLeft');
       TLoggerHelper.error(e.toString());
     }
   }
@@ -274,8 +275,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
     try {
       if (!shouldGenerateFakeItems) {
         final isAllReady = await _roomRepository.checkIfAllPlayersReady(roomID);
-        if (isAllReady) {
-          // TODO : should add this : && roomInfo.value.players.length > 1
+        if (isAllReady && roomInfo.value.players.length > 1) {
           // Update game state
           await _roomRepository.updateGameState(roomID, GameState.progress);
         } else {
@@ -325,7 +325,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   Future<void> validateImage() async {
     try {
       isImagePickerShown.value = true;
-      final photo = await _photoPickerService.pickPhoto();
+      final photo = await _photoPickerService.takePhoto();
       itemHuntStatus.value = ItemHuntStatus.validationInProgress;
       final isPhotoValid =
           await GeminiRepository.instance.validateImage(currentitem, photo);

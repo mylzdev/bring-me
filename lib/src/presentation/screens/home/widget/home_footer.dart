@@ -1,15 +1,15 @@
-import 'package:bring_me/src/core/common/widgets/dialog/custom_dialog.dart';
-import 'package:bring_me/src/core/config/lottie.dart';
-import 'package:bring_me/src/presentation/controllers/home_controller/home_controller.dart';
-import 'package:bring_me/src/presentation/screens/auth/auth.dart';
-import 'package:bring_me/src/presentation/screens/auth/avatar_selection.dart';
-import 'package:bring_me/src/presentation/screens/leader_board/leader_board.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
+import '../../../../core/common/widgets/dialog/custom_dialog.dart';
 import '../../../../core/common/widgets/text/icon_text.dart';
+import '../../../../core/config/lottie.dart';
+import '../../../controllers/home_controller/home_controller.dart';
+import '../../auth/auth.dart';
+import '../../auth/avatar_selection.dart';
+import '../../leader_board/leader_board.dart';
 
 class THomeFooter extends StatelessWidget {
   const THomeFooter({
