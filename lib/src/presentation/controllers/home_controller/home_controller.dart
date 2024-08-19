@@ -142,6 +142,7 @@ class HomeController extends GetxController {
       final isPermissionGranted = await TPermissionHandler.requestPermission(
           permission: Permission.camera);
       if (isPermissionGranted) {
+        TLoggerHelper.info('sdaad');
         callback();
       } else {
         Get.defaultDialog(

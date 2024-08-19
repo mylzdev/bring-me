@@ -61,7 +61,9 @@ class THomePlayButtons extends GetView<QrScannerController> {
               controller: homeController,
               title: 'Create Room',
               maxPlayerVisible: true,
-              onPressed: homeController.createRoom,
+              onPressed: () => homeController.askForCameraPermission(
+                callback: () => homeController.createRoom(),
+              ),
             ),
           ),
         ),
@@ -76,7 +78,9 @@ class THomePlayButtons extends GetView<QrScannerController> {
                 title: 'Join Room',
                 joinTextFieldVisible: false,
                 qrVisible: true,
-                onPressed: () => homeController.joinRoomViaCode(),
+                onPressed: () => homeController.askForCameraPermission(
+                  callback: () => homeController.joinRoomViaCode(),
+                ),
               );
             },
           ),

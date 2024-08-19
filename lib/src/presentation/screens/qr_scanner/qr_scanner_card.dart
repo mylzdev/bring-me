@@ -29,9 +29,7 @@ class QRScannerCard extends StatelessWidget {
         Expanded(
           child: THomeQrCard(
             icon: Icons.qr_code_scanner_rounded,
-            onPressed: () => controller.askForCameraPermission(
-              callback: () => Get.to(() => const THomeQRScanner()),
-            ),
+            onPressed: () => Get.to(() => const THomeQRScanner()),
           ),
         ),
       ],
