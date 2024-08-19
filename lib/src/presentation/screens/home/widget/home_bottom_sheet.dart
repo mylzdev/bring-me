@@ -91,8 +91,10 @@ class THomeBottomSheet {
                       style: Theme.of(Get.context!).textTheme.headlineSmall,
                     ),
                     SizedBox(height: TSizes.spaceBtwItems),
-                    const Expanded(
-                      child: QRScannerCard(),
+                    Expanded(
+                      child: QRScannerCard(
+                        controller: controller,
+                      ),
                     ),
                   ],
                 ),

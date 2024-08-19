@@ -31,7 +31,9 @@ class THomePlayButtons extends GetView<QrScannerController> {
               THomeBottomSheet.show(
                 controller: homeController,
                 title: 'Single Player',
-                onPressed: homeController.playSinglePlayer,
+                onPressed: () => homeController.askForCameraPermission(
+                  callback: () => homeController.playSinglePlayer(),
+                ),
               );
             },
           ),

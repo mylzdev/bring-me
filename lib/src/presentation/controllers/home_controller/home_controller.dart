@@ -1,13 +1,17 @@
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 
+import '../../../core/common/widgets/button/elevated_button.dart';
+import '../../../core/config/colors.dart';
 import '../../../core/config/enums.dart';
+import '../../../core/config/sizes.dart';
 import '../../../core/config/text_strings.dart';
+import '../../../core/utils/device/permission_handler.dart';
 import '../../../core/utils/helpers/helper_functions.dart';
 import '../../../core/utils/logging/logger.dart';
 import '../../../core/utils/popups/loader.dart';
@@ -57,6 +61,7 @@ class HomeController extends GetxController {
   Future<void> createRoom() async {
     try {
       TFullScreenLoader.openLoadingDialog('Creating room');
+
       roomID.value = THelperFunctions
           .generateRoomID(); // TODO : Fix where can be duplicated
 
@@ -79,9 +84,7 @@ class HomeController extends GetxController {
     } catch (e) {
       TLoggerHelper.error(e.toString());
       TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
-    } finally {
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => TFullScreenLoader.stopLoading);
+      TFullScreenLoader.stopLoading();
     }
   }
 
@@ -123,19 +126,43 @@ class HomeController extends GetxController {
       gameState.value = GameState.initial;
       Get.offAll(() => const GameScreen());
       final response =
-          await GeminiRepository.instance.loadHunt(huntLocation.value);
+          await GeminiRepository.instance.loadItems(huntLocation.value);
 
-      // Randomize items
-      final shuffledItems = (response.toList()..shuffle(math.Random()))
-          .take(RoomPlayerModel.maxItems)
-          .toList();
-
-      items.addAll(shuffledItems);
+      items.addAll(response);
       gameState.value = GameState.progress;
     } catch (e) {
       Get.to(() => const HomeScreen());
       TLoggerHelper.error(e.toString());
       TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
+    }
+  }
+
+  Future<void> askForCameraPermission({required VoidCallback callback}) async {
+    try {
+      final isPermissionGranted = await TPermissionHandler.requestPermission(
+          permission: Permission.camera);
+      if (isPermissionGranted) {
+        callback();
+      } else {
+        Get.defaultDialog(
+          titlePadding: EdgeInsets.only(top: TSizes.defaultSpace),
+          backgroundColor: TColors.darkContainer,
+          title: 'Allow Camera Permission',
+          middleText:
+              'We need your permission to access camera for QR Scanning and Image Validation',
+          contentPadding: EdgeInsets.all(TSizes.defaultSpace),
+          confirm: TElevatedButton(
+            title: 'Confirm',
+            onPressed: () async =>
+                await TPermissionHandler.requestPermissionWithSettings()
+                    .then((_) => Get.back()),
+          ),
+        ).then(
+          (_) => Get.back(),
+        );
+      }
+    } catch (e) {
+      rethrow;
     }
   }
 
@@ -168,6 +195,25 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       TLoggerHelper.error(e.toString());
+    }
+  }
+
+  Future<void> showShareAppDialog() async {
+    try {
+      final result = await Share.share(
+        'Check out this amazing app: BRING ME! A classic game with a modern twist. Get it here: https://github.com/mylzdev/bring-me/releases',
+        subject: 'Join the Fun with Bring Me',
+      );
+
+      if (result.status == ShareResultStatus.success) {
+        TLoggerHelper.info('SUCCESS');
+      } else if (result.status == ShareResultStatus.dismissed) {
+        TLoggerHelper.warning('DISMISSED');
+      } else {
+        TLoggerHelper.error('UNAVAILABLE');
+      }
+    } catch (e) {
+      TLoggerHelper.error('Failed to share the app: $e');
     }
   }
 }

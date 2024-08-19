@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
+import 'package:get/get.dart';
 
 import '../../../core/common/widgets/appbar/custom_header.dart';
 import '../../../core/common/widgets/avatar/avatar.dart';
@@ -18,6 +18,7 @@ class AuthenticationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = PlayerController.instance;
+    final tmepController = Get.put(TempController());
     return SafeArea(
       child: Scaffold(
         backgroundColor: TColors.darkContainer,
@@ -44,7 +45,9 @@ class AuthenticationScreen extends StatelessWidget {
                       .textTheme
                       .titleLarge!
                       .apply(letterSpacingDelta: 2),
-                  controller: controller.usernameController,
+                  controller: isUpdating
+                      ? tmepController.tempUsernameController
+                      : controller.usernameController,
                   validator: (value) => !isUpdating
                       ? TValidator.validateNickname('Username', value)
                       : TValidator.validateUpdateUsername(
@@ -78,13 +81,13 @@ class AuthenticationScreen extends StatelessWidget {
             ),
             const Spacer(),
             TAnimatedCircleButton(
-              icon: isUpdating ? Ionicons.sync : null,
+              controller: tmepController,
               onTap: () {
-                TCircleButtonController.instance.isButtonTapped();
+                tmepController.isButtonTapped();
                 if (isUpdating) {
-                  controller.updatePlayerName();
+                  tmepController.updateName();
                 } else {
-                  PlayerController.instance.createPlayer();
+                  controller.createPlayer();
                 }
               },
             ),
@@ -94,33 +97,3 @@ class AuthenticationScreen extends StatelessWidget {
     );
   }
 }
-
-// SizedBox(
-//               width: double.maxFinite,
-//               child: Row(
-//                 children: [
-//                   Expanded(
-//                     child: Form(
-//                       key: controller.usernameFormKey,
-//                       child: TextFormField(
-//                         controller: controller.usernameController,
-//                         validator: (value) =>
-//                             TValidator.validateNickname('Username', value),
-//                       ),
-//                     ),
-//                   ),
-//                   IconButton(
-//                     onPressed: () => controller.refreshUsername(),
-//                     icon: Icon(Ionicons.dice_outline, size: TSizes.iconLg),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             SizedBox(height: TSizes.spaceBtwItems),
-//             SizedBox(
-//               width: double.maxFinite,
-//               child: TGradientElevatedButton(
-//                 text: 'Continue',
-//                 onPressed: () => controller.createUsername(),
-//               ),
-//             ),

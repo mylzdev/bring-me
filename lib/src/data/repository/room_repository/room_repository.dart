@@ -24,7 +24,7 @@ class RoomRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Problem while creating room';
+      throw 'Unknown problem while creating room. Please try again';
     }
   }
 
@@ -65,7 +65,13 @@ class RoomRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      rethrow;
+      if (e == "Room doesn't exist") {
+        throw "Room doesn't exist";
+      }
+      if (e == 'Room is full') {
+        throw 'Room if full';
+      }
+      throw 'Unknown problem while joining room. Please try again';
     }
   }
 
@@ -86,7 +92,7 @@ class RoomRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Problem while quiting room';
+      throw 'Unknown problem while quiting room. Please try again';
     }
   }
 
@@ -110,11 +116,11 @@ class RoomRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Problem while removing player from room';
+      throw 'Unknown problem while removing player from room';
     }
   }
 
-  Future<void> updateItems(String roomID, List<String> items) async {
+  Future<List<String>> updateItems(String roomID, List<String> items) async {
     try {
       final roomRef = _db.collection('Rooms').doc(roomID);
       final roomSnapshot = await roomRef.get();
@@ -126,7 +132,7 @@ class RoomRepository extends GetxService {
       RoomModel room = RoomModel.fromSnapshot(roomSnapshot);
       room = room.copyWith(items: items);
       await roomRef.update(room.toJson());
-
+      return room.items;
     } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
     } on FormatException catch (_) {
@@ -134,7 +140,7 @@ class RoomRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Problem while updating items';
+      throw 'Unknown problem while updating items';
     }
   }
 
@@ -166,7 +172,31 @@ class RoomRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Problem while updating player ready state';
+      throw 'Unknown problem while updating player ready state';
+    }
+  }
+
+  Future<void> updateWinnerName(String roomID, String? winnerName) async {
+    try {
+      final roomRef = _db.collection('Rooms').doc(roomID);
+      final roomSnapshot = await roomRef.get();
+
+      if (!roomSnapshot.exists) {
+        throw "Room doesn't exist";
+      }
+
+      RoomModel room = RoomModel.fromSnapshot(roomSnapshot);
+      room = room.copyWith(winnerName: winnerName);
+
+      await roomRef.update(room.toJson());
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Unknown problem while updating winner name';
     }
   }
 
@@ -200,7 +230,7 @@ class RoomRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Problem while updating player score & item left';
+      throw 'Unknown problem while updating player score & item left';
     }
   }
 
@@ -229,7 +259,7 @@ class RoomRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Problem while checking if all players are ready';
+      throw 'Unknown problem while checking if all players are ready';
     }
   }
 
@@ -259,7 +289,7 @@ class RoomRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Problem while checking if all players are ready';
+      throw 'Unknown problem while checking if all players are ready';
     }
   }
 
@@ -273,7 +303,7 @@ class RoomRepository extends GetxService {
     } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
     } catch (e) {
-      throw 'Problem while listening to room';
+      throw 'Unknown problem while listening to room';
     }
   }
 }

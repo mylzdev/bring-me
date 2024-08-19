@@ -33,11 +33,9 @@ class TMultiGameHeader extends StatelessWidget {
                   TMultiGameProgress(controller: controller),
                 GameState.ended => TMultiGameEnded(
                     // Multi Game State Ends
-                    subtitle: controller.isDraw
-                        ? 'Draw'
-                        : controller.sortedPlayer.first.name,
-                    title: 'Winner',
-                    shouldPlayPopper: controller.isDraw ? false : true,
+                    subtitle: controller.roomInfo.value.winnerName ?? 'Draw',
+                    title: controller.roomInfo.value.winnerName != null ? 'Winner' : null,
+                    shouldPlayPopper: controller.roomInfo.value.winnerName != null,
                   ),
               }
             : TMultiGameEnded(
@@ -53,12 +51,13 @@ class TMultiGameHeader extends StatelessWidget {
 class TMultiGameEnded extends StatelessWidget {
   const TMultiGameEnded({
     super.key,
-    required this.title,
-    required this.subtitle,
+    this.title,
+    this.subtitle,
     this.shouldPlayPopper = false,
   });
 
-  final String title, subtitle;
+  final String? title;
+  final String? subtitle;
   final bool shouldPlayPopper;
 
   @override

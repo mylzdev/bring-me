@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:get/get.dart';
@@ -6,13 +7,14 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 
 import '../../../core/config/enums.dart';
 import '../../../core/utils/exceptions/gemini_exception.dart';
+import '../room_repository/room_player_model.dart';
 import 'gemini_client.dart';
 
 class GeminiRepository extends GetxService {
   static GeminiRepository get instance => Get.find();
   final _client = GeminiClient();
 
-  Future<List<String>> loadHunt(HuntLocation gameLocation) async {
+  Future<List<String>> loadItems(HuntLocation gameLocation) async {
     final location = switch (gameLocation) {
       HuntLocation.indoor => 'at home',
       HuntLocation.outdoor => 'outside',
@@ -26,7 +28,13 @@ class GeminiRepository extends GetxService {
       }
 
       if (jsonDecode(response) case {'items': List<dynamic> items}) {
-        return List<String>.from(items);
+        final generatedItems = List<String>.from(items);
+
+        final shuffledItems = (generatedItems..shuffle(math.Random()))
+            .take(RoomPlayerModel.maxItems)
+            .toList();
+
+        return shuffledItems;
       }
 
       throw const GeminiRepositoryException('Invalid response from Gemini');

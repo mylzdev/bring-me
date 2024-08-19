@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
@@ -48,7 +49,7 @@ class THomeQRScanner extends GetView<QrScannerController> {
                   ),
                   QRScannerOverlay(
                     scanAreaWidth: double.maxFinite,
-                    scanAreaHeight: Get.height * 0.4,
+                    scanAreaHeight: 300.h,
                     borderColor: TColors.primary,
                     overlayColor: Colors.transparent,
                   ),

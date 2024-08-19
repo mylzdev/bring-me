@@ -85,13 +85,13 @@ class PlayerController extends GetxController {
     }
   }
 
-  Future<void> updatePlayerName() async {
+  Future<void> updatePlayerName(String updatedName) async {
     try {
       if (!usernameFormKey.currentState!.validate()) return;
 
       TFullScreenLoader.openLoadingDialog('Updating');
 
-      await _playerRepository.updatePlayerName(usernameController.text);
+      await _playerRepository.updatePlayerName(updatedName);
       TFullScreenLoader.stopLoading();
       Get.back();
     } catch (e) {
@@ -101,11 +101,13 @@ class PlayerController extends GetxController {
     }
   }
 
-  Future<void> updatePlayerAvatar() async {
+  Future<void> updatePlayerAvatar(int index) async {
     try {
       TFullScreenLoader.openLoadingDialog('Updating');
 
-      await _playerRepository.updatePlayerAvatar(avatarIndex.value);
+      await _playerRepository.updatePlayerAvatar(index);
+      TLoggerHelper.info('message');
+      avatarIndex.value = index;
       TFullScreenLoader.stopLoading();
       Get.back();
     } catch (e) {
@@ -129,6 +131,9 @@ class PlayerController extends GetxController {
               TLoggerHelper.warning('Player does not exist.');
             }
           },
+          onError: (e) {
+            TLoggerHelper.error(e);
+          }
         );
       } else {
         _listenToAuthChanges();

@@ -1,16 +1,13 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/config/text_strings.dart';
 import '../../../core/utils/logging/logger.dart';
 import '../../../core/utils/popups/loader.dart';
 import '../../../core/utils/popups/popups.dart';
-import '../../../data/services/photo_picker/photo_picker_service.dart';
 import '../home_controller/home_controller.dart';
 
 class QrScannerController extends GetxController with WidgetsBindingObserver {
@@ -22,10 +19,9 @@ class QrScannerController extends GetxController with WidgetsBindingObserver {
   );
 
   StreamSubscription<BarcodeCapture?>? _subscription;
-  final _photoPicker = PhotoPickerService();
 
   @override
-  void onInit() {
+  void onInit() async {
     // Start listening to lifecycle changes.
     WidgetsBinding.instance.addObserver(this);
 
@@ -82,11 +78,12 @@ class QrScannerController extends GetxController with WidgetsBindingObserver {
   }
 
   void _handleBarcode(BarcodeCapture barcode) async {
-    if (barcode.barcodes.isEmpty) {
-      TLoggerHelper.info('EMPTY');
-      return;
-    }
     try {
+      if (barcode.barcodes.isEmpty) {
+        TLoggerHelper.info('EMPTY');
+        return;
+      }
+
       for (final code in barcode.barcodes) {
         TFullScreenLoader.openLoadingDialog('Joining room');
 
@@ -102,35 +99,6 @@ class QrScannerController extends GetxController with WidgetsBindingObserver {
       unawaited(mobileController.stop());
       TLoggerHelper.error(e.toString());
       TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
-    }
-  }
-
-  Future<void> scanQrFromImage() async {
-    try {
-      final XFile? image = await _photoPicker.pickImage();
-
-      if (image != null) {
-        try {
-          TFullScreenLoader.openLoadingDialog('Joining room');
-
-          final File imageFile = File(image.path);
-          final result = await mobileController.analyzeImage(imageFile.path);
-
-          if (result != null && result.barcodes.isNotEmpty) {
-            final qrCode = result.barcodes.first.rawValue;
-            await HomeController.instance.joinRoomViaQR(qrCode!);
-          } else {
-            TLoggerHelper.warning('No QR Code found in the image.');
-            TFullScreenLoader.stopLoading();
-          }
-        } catch (e) {
-          TLoggerHelper.error('Error scanning QR code from image: $e');
-          TFullScreenLoader.stopLoading();
-          TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
-        }
-      }
-    } catch (e) {
-      TLoggerHelper.error(e.toString());
     }
   }
 }

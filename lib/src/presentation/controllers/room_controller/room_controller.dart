@@ -149,6 +149,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   // Handle room closure
   void handleRoomClosure() {
     if (!isRoomLeader) {
+      TLoggerHelper.error('message');
       TPopup.warningSnackbar(
           title: TTexts.ohSnap, message: 'The room owner left the room');
     }
@@ -177,33 +178,31 @@ class RoomController extends GetxController with WidgetsBindingObserver {
             waitingForOthersOpacity.value == 1.0 ? 0.0 : 1.0;
       });
 
-      // Rx listeners
-      everAll(
-        [score, itemLeft],
-        (_) => _updatePlayerScoreAndItemLeft(),
-      );
+      _setupRxListeners();
     } catch (e) {
       _handleError(e, '_startGame');
       rethrow;
     }
   }
 
+  void _setupRxListeners() {
+    debounce(score, (_) => _updatePlayerScoreAndItemLeft(),
+        time: Durations.short4);
+    debounce(itemLeft, (_) => _updatePlayerScoreAndItemLeft(),
+        time: Durations.short4);
+  }
+
   Future<void> updateItems() async {
     try {
       TFullScreenLoader.openLoadingDialog('Generating items');
 
-      final response = await GeminiRepository.instance.loadHunt(
+      final response = await GeminiRepository.instance.loadItems(
         roomInfo.value.huntLocation,
       );
 
-      // Randomize items
-      final items = (response.toList()..shuffle(math.Random()))
-          .take(RoomPlayerModel.maxItems)
-          .toList();
-
       // Update items
-      await _roomRepository.updateItems(roomID, items);
-      _items.addAll(items);
+      await _roomRepository.updateItems(roomID, response);
+      _items.addAll(response);
     } catch (e) {
       _handleError(e, 'update items');
       await _roomRepository.updateGameState(roomID, GameState.initial);
@@ -283,7 +282,8 @@ class RoomController extends GetxController with WidgetsBindingObserver {
             TPopup.customToast(message: 'Player(s) are not ready');
           } else {
             TPopup.warningSnackbar(
-                title: 'Invite a fren', message: 'At least 2 player to start');
+                title: 'Invite a friends',
+                message: 'At least 2 players to start');
           }
         }
       } else {
@@ -300,6 +300,15 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   Future<void> endGame() async {
     try {
       await Future.delayed(const Duration(milliseconds: 1500));
+
+      String? winnerName;
+      if (isDraw) {
+        winnerName = null;
+      } else {
+        winnerName = sortedPlayer.first.name;
+      }
+      await _roomRepository.updateWinnerName(roomID, winnerName);
+
       await _roomRepository.updateGameState(roomID, GameState.ended);
     } catch (e) {
       TLoggerHelper.error(e.toString());
@@ -336,7 +345,7 @@ class RoomController extends GetxController with WidgetsBindingObserver {
         _handleFailedImageValidation();
       }
     } catch (e) {
-      _handleImageValidationError(e);
+      _handleFailedImageValidation();
     } finally {
       await Future.delayed(const Duration(seconds: 1));
       itemHuntStatus.value = ItemHuntStatus.initial;
@@ -357,14 +366,6 @@ class RoomController extends GetxController with WidgetsBindingObserver {
   // Handles failed image validation
   void _handleFailedImageValidation() {
     itemHuntStatus.value = ItemHuntStatus.validationFailure;
-    TLoggerHelper.info('Failed');
-  }
-
-  // Handles image validation error
-  void _handleImageValidationError(Object e) {
-    TLoggerHelper.error(e.toString());
-    itemHuntStatus.value = ItemHuntStatus.validationFailure;
-    TLoggerHelper.info('Failed');
   }
 
   _resetTimer() {

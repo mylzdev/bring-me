@@ -7,7 +7,10 @@ import '../../config/lottie.dart';
 import '../../config/sizes.dart';
 
 class TFullScreenLoader {
-  static void openLoadingDialog(String text, {bool canPop = false}) {
+  static void openLoadingDialog(
+    String text, {
+    bool canPop = false,
+  }) {
     showDialog(
       useSafeArea: false,
       barrierColor: Colors.black87,
@@ -28,7 +31,10 @@ class TFullScreenLoader {
                 SizedBox(height: TSizes.spaceBtwItems),
                 Text(
                   '$text...',
-                  style: Theme.of(Get.context!).textTheme.titleLarge!.apply(letterSpacingDelta: 1.sp),
+                  style: Theme.of(Get.context!)
+                      .textTheme
+                      .titleLarge!
+                      .apply(letterSpacingDelta: 1.sp),
                 ),
               ],
             ),

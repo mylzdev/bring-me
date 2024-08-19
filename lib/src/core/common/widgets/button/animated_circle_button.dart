@@ -4,20 +4,23 @@ import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
 import '../../../../core/config/colors.dart';
+import '../../../../presentation/controllers/player_controller/player_controller.dart';
+import '../../../utils/logging/logger.dart';
 
 class TAnimatedCircleButton extends StatelessWidget {
   const TAnimatedCircleButton({
     super.key,
+    required this.controller,
     required this.onTap,
     this.icon,
   });
 
   final VoidCallback onTap;
   final IconData? icon;
+  final TempController controller;
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(TCircleButtonController());
     return GestureDetector(
       onTapDown: (_) => controller.isButtonTapped(),
       onTap: onTap,
@@ -43,9 +46,36 @@ class TAnimatedCircleButton extends StatelessWidget {
   }
 }
 
-class TCircleButtonController extends GetxController {
-  static TCircleButtonController get instance => Get.find();
+class TempController extends GetxController {
+  static TempController get instance => Get.find();
+
+  final _playerController = PlayerController.instance;
   final isTap = false.obs;
+  final tempAvatarIndex = 0.obs;
+  final tempUsernameController = TextEditingController();
+
+  @override
+  void onInit() {
+    tempAvatarIndex.value = _playerController.avatarIndex.value;
+    tempUsernameController.text = _playerController.playername;
+    super.onInit();
+  }
 
   void isButtonTapped() => isTap.value = !isTap.value;
+
+  Future<void> updateAvatar() async {
+    try {
+      await _playerController.updatePlayerAvatar(tempAvatarIndex.value);
+    } catch (e) {
+      TLoggerHelper.error(e.toString());
+    }
+  }
+  
+  Future<void> updateName() async {
+    try {
+      await _playerController.updatePlayerName(tempUsernameController.text);
+    } catch (e) {
+      TLoggerHelper.error(e.toString());
+    }
+  }
 }

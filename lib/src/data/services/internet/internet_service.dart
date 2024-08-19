@@ -1,10 +1,13 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/config/colors.dart';
 import '../../../core/utils/logging/logger.dart';
+import '../../../presentation/screens/auth/welcome.dart';
 import '../../../presentation/screens/home/home.dart';
+import '../../repository/player_repository/player_repository.dart';
 
 /// Manages the network connectivity status and provides methods to check and handle connectivity changes.
 class InternetService extends GetxService {
@@ -12,6 +15,7 @@ class InternetService extends GetxService {
 
   final connectivity = Connectivity();
   final _isConnectedClick = false.obs;
+  bool isFontsLoaded = false;
 
   @override
   void onInit() {
@@ -19,11 +23,22 @@ class InternetService extends GetxService {
     super.onInit();
   }
 
-  void _updateConnectivityStatus(List<ConnectivityResult> connectivityResult) {
+  void _updateConnectivityStatus(
+      List<ConnectivityResult> connectivityResult) async {
     if (connectivityResult.contains(ConnectivityResult.none)) {
       if (!(Get.isDialogOpen ?? false)) {
         TLoggerHelper.info('NO INTERNET');
         showNoInternetDialog();
+      }
+    } else {
+      if (!isFontsLoaded) {
+        await GoogleFonts.pendingFonts([
+          GoogleFonts.playfair(),
+          GoogleFonts.poppins(),
+          GoogleFonts.blackHanSans(),
+        ]);
+        TLoggerHelper.info('FONTS LOADED');
+        isFontsLoaded = true;
       }
     }
   }
@@ -57,9 +72,14 @@ class InternetService extends GetxService {
                     onPressed: () async {
                       final reconnected = await _attemptReconnect();
                       if (reconnected) {
-                        if (shouldRedirectToHome) {
+                        if (shouldRedirectToHome &&
+                            PlayerRepository.instance.authUser != null) {
                           _isConnectedClick.value = false;
                           Get.offAll(() => const HomeScreen());
+                        } else if (shouldRedirectToHome &&
+                            PlayerRepository.instance.authUser == null) {
+                          _isConnectedClick.value = false;
+                          Get.offAll(() => const WelcomeScreen());
                         } else {
                           _closeNoInternetDialog();
                         }

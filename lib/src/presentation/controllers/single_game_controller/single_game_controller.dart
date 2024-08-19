@@ -139,7 +139,6 @@ class SingleGameController extends GetxController {
       }
     } catch (e) {
       TLoggerHelper.error(e.toString());
-      TPopup.errorSnackbar(title: TTexts.ohSnap, message: e.toString());
       itemHuntStatus.value = ItemHuntStatus.validationFailure;
       resetItemStatus();
     }
@@ -169,12 +168,9 @@ class SingleGameController extends GetxController {
       gameState.value = GameState.initial;
 
       final response =
-          await GeminiRepository.instance.loadHunt(huntLocation.value);
-      // Randomize items
-      final shuffledItems = (response.toList()..shuffle(math.Random()))
-          .take(RoomPlayerModel.maxItems)
-          .toList();
-      _items.value = shuffledItems;
+          await GeminiRepository.instance.loadItems(huntLocation.value);
+
+      _items.value = response;
 
       gameState.value = GameState.progress;
     } catch (e) {
@@ -185,7 +181,7 @@ class SingleGameController extends GetxController {
 
   void onLeaveGame() {
     CustomDialog.showOnLeaveDialog(
-      title: 'The data might be lost',
+      title: 'Confirmation',
       subtitle: 'Are you sure you want to leave the room?',
       onLeavePressed: () => Get.offAll(() => const HomeScreen()),
     );

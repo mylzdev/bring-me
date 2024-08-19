@@ -18,7 +18,8 @@ class AvatarSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = PlayerController.instance;
+    final tempController = Get.put(TempController());
+    final playerController = PlayerController.instance;
     final avatars = PlayerAvatarModel.avatars;
     return SafeArea(
       child: Scaffold(
@@ -39,14 +40,18 @@ class AvatarSelection extends StatelessWidget {
                 crossAxisCount: 3,
               ),
               itemBuilder: (_, index) => GestureDetector(
-                onTap: () => controller.avatarIndex.value = index,
+                onTap: () => isUpdating
+                    ? tempController.tempAvatarIndex.value = index
+                    : playerController.avatarIndex.value = index,
                 child: Obx(
                   () => TAvatar(
                     avatar: avatars[index],
                     height: 120,
                     width: 120,
                     margin: EdgeInsets.all(TSizes.sm * 2),
-                    isSelected: controller.avatarIndex.value == index,
+                    isSelected: isUpdating
+                        ? tempController.tempAvatarIndex.value == index
+                        : playerController.avatarIndex.value == index,
                     borderColor: Colors.transparent,
                   ),
                 ),
@@ -59,10 +64,11 @@ class AvatarSelection extends StatelessWidget {
             Positioned(
               bottom: 0,
               child: TAnimatedCircleButton(
+                controller: tempController,
                 onTap: () {
-                  TCircleButtonController.instance.isButtonTapped();
+                  tempController.isButtonTapped();
                   if (isUpdating) {
-                    controller.updatePlayerAvatar();
+                    tempController.updateAvatar();
                   } else {
                     Get.to(
                       () => const AuthenticationScreen(),

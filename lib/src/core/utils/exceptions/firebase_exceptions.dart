@@ -95,8 +95,10 @@ class TFirebaseException implements Exception {
         return 'This credential is already associated with a different user account.';
       case 'object-not-found':
         return 'Data not found.';
+      case 'unavailable':
+        return 'Something went wrong with your internet connection. Please check and try again';
       default:
-        return 'An unexpected Firebase error occurred. Please try again.';
+        return 'An unexpected server error occurred. Please try again.';
     }
   }
 }

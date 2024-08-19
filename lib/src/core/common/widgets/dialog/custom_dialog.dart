@@ -86,6 +86,8 @@ class CustomDialog {
     VoidCallback? onLeavePressed,
     required String title,
     required String subtitle,
+    String cancelText = 'Cancel',
+    String confirmText = 'Confirm',
   }) async {
     await Get.defaultDialog(
       title: title,
@@ -100,7 +102,7 @@ class CustomDialog {
             side: BorderSide.none),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: TSizes.lg),
-          child: const Text('Leave'),
+          child: Text(confirmText),
         ),
       ),
       // Cancel button
@@ -109,7 +111,7 @@ class CustomDialog {
         onPressed: () => Navigator.of(Get.overlayContext!).pop(),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: TSizes.lg),
-          child: const Text('Cancel'),
+          child: Text(cancelText),
         ),
       ),
     );
